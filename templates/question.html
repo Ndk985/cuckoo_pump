@@ -7,6 +7,10 @@
       <h1>{{ question.title }}</h1>
       <div class="col-12 col-lg-7 my-5">
         <p>{{ question.text }}</p>
+        <p>
+          Ссылка на вопрос:
+          <a href="{{ url_for('question_view', id=question.id, _external=True) }}">{{ url_for('question_view', id=question.id, _external=True) }}</a>
+        </p>
       </div>
       <div class="col-12 col-lg-5">
         <img class="img-fluid mx-auto d-block" src="{{ url_for('static', filename='img/illustration.png') }}" alt="" />
