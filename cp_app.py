@@ -19,11 +19,11 @@ db = SQLAlchemy(app)
 
 class Question(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(128), nullable=False)
+    title = db.Column(db.String(128), nullable=False, unique=True)
     text = db.Column(db.Text, unique=True, nullable=False)
 
 
-class OpinionForm(FlaskForm):
+class QuestionForm(FlaskForm):
     title = StringField(
         'Введите вопрос',
         validators=[DataRequired(message='Обязательное поле'),
@@ -46,9 +46,22 @@ def index_view():
     return render_template('question.html', question=question)
 
 
-@app.route('/add')
+@app.route('/add', methods=['GET', 'POST'])
 def add_question_view():
-    return render_template('add_question.html')
+    form = QuestionForm()
+    if form.validate_on_submit():
+        title = form.title.data
+        if Question.query.filter_by(title=title).first() is not None:
+            flash('Такой вопрос уже был записан ранее!')
+            return render_template('add_question.html', form=form)
+        question = Question(
+            title=title,
+            text=form.text.data,
+        )
+        db.session.add(question)
+        db.session.commit()
+        return redirect(url_for('question_view', id=question.id))
+    return render_template('add_question.html', form=form)
 
 
 @app.route('/questions/<int:id>')
