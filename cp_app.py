@@ -3,6 +3,7 @@ from random import randrange
 
 from flask import Flask, abort, flash, redirect, render_template, url_for
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, TextAreaField, URLField
@@ -15,6 +16,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite3'
 app.config['SECRET_KEY'] = 'MAY THE FORCE BE WITH YOU'
 
 db = SQLAlchemy(app)
+migrate = Migrate(app, db)
 
 
 class Question(db.Model):
