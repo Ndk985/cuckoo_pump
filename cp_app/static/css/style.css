@@ -6,7 +6,7 @@
 
 body {
     font-family: Montserrat, Arial, sans-serif;
-    background-color: #F9F9F9;
+    background-color: #cea87d;
     line-height: 1.2;
     letter-spacing: 0.01em;
     color: #272727;
@@ -21,10 +21,10 @@ a.nav-link, a {
 }
 
 a.nav-link:hover, a:hover {
-    color: #00D6D6;
+    color: #e7390d;
 }
 .nav-pills a.nav-link.active {
-    background-color: #00D6D6;
+    background-color: #c619af;
     border-radius: 20px;
 }
 
@@ -43,9 +43,9 @@ p.small {
 
 .form-control:focus {
     background-color: #FFF;
-    border-color: #00D6D6;
+    border-color: #c619af;
     outline: 0;
-    box-shadow: 0 0 0 2px rgb(0, 214, 214, 1);
+    box-shadow: 0 0 0 2px rgb(167, 17, 152);
   }
 
 textarea {
@@ -53,14 +53,14 @@ textarea {
 }
 
 .button {
-    background-color: #3BBEBE;
+    background-color: #e7390d;
     border-radius: 20px;
     color: #FFF;
     font-size: 20px;
 }
 
 .button:hover {
-    background-color: #00D6D6;
+    background-color: #c619af;
     color: #FFF;
 }
 
