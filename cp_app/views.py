@@ -7,13 +7,19 @@ from .forms import QuestionForm
 from .models import Question
 
 
+def random_question():
+    quantity = Question.query.count()
+    if quantity:
+        offset_value = randrange(quantity)
+        opinion = Question.query.offset(offset_value).first()
+        return opinion
+
+
 @app.route('/')
 def index_view():
-    quantity = Question.query.count()
-    if not quantity:
+    question = random_question()
+    if question is None:
         abort(500)
-    offset_value = randrange(quantity)
-    question = Question.query.offset(offset_value).first()
     return render_template('question.html', question=question)
 
 
