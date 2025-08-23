@@ -18,18 +18,11 @@ def get_question(id):
 @app.route('/api/questions/<int:id>/', methods=['PATCH'])
 def update_question(id):
     data = request.get_json()
-    if (
-        'text' in data and 
-        Question.query.filter_by(text=data['text']).first() is not None
-    ):
-        raise InvalidAPIUsage('Такой вопрос уже есть в базе данных')
     question = Question.query.get(id)
     if question is None:
         raise InvalidAPIUsage('Вопрос с указанным id не найден', 404)
     question.title = data.get('title', question.title)
     question.text = data.get('text', question.text)
-    question.source = data.get('source', question.source)
-    question.added_by = data.get('added_by', question.added_by)
     db.session.commit()
     return jsonify({'question': question.to_dict()}), 200
 
@@ -56,7 +49,7 @@ def add_question():
     data = request.get_json()
     if 'title' not in data or 'text' not in data:
         raise InvalidAPIUsage('В запросе отсутствуют обязательные поля')
-    if Question.query.filter_by(text=data['text']).first() is not None:
+    if Question.query.filter_by(title=data['title']).first() is not None:
         raise InvalidAPIUsage('Такой вопрос уже есть в базе данных')
     question = Question()
     question.from_dict(data)
