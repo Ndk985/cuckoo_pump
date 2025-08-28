@@ -45,3 +45,19 @@ def add_question_view():
 def question_view(id):
     question = Question.query.get_or_404(id)
     return render_template('question.html', question=question)
+
+
+@app.route('/questions/<int:id>/edit', methods=['GET', 'POST'])
+def edit_question_view(id):
+    question = Question.query.get_or_404(id)
+
+    form = QuestionForm(obj=question)
+    if form.validate_on_submit():
+        form.populate_obj(question)
+        db.session.commit()
+        flash('Вопрос обновлён')
+        return redirect(url_for('question_view', id=question.id))
+
+    return render_template('add_question.html',
+                           form=form,
+                           edit_mode=True)

@@ -11,6 +11,10 @@
           Ссылка на вопрос:
           <a href="{{ url_for('question_view', id=question.id, _external=True) }}">{{ url_for('question_view', id=question.id, _external=True) }}</a>
         </p>
+        <a class="button d-inline-block mt-3 px-4 py-2 text-decoration-none"
+          href="{{ url_for('edit_question_view', id=question.id) }}">
+            Редактировать вопрос
+        </a>
       </div>
       <div class="col-12 col-lg-5">
         <img class="img-fluid mx-auto d-block" src="{{ url_for('static', filename='img/illustration.png') }}" alt="" />
