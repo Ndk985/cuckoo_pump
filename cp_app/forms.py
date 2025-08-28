@@ -1,6 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, TextAreaField, URLField
 from wtforms.validators import DataRequired, Length, Optional
+from flask_ckeditor import CKEditorField
 
 
 class QuestionForm(FlaskForm):
@@ -9,7 +10,7 @@ class QuestionForm(FlaskForm):
         validators=[DataRequired(message='Обязательное поле'),
                     Length(1, 128)]
     )
-    text = TextAreaField(
+    text = CKEditorField(
         'Напишите ответ',
         validators=[DataRequired(message='Обязательное поле')]
     )

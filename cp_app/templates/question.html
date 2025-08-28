@@ -6,7 +6,7 @@
     <div class="row">
       <h1>{{ question.title }}</h1>
       <div class="col-12 col-lg-7 my-5">
-        <p>{{ question.text }}</p>
+        <div class="markdown-body">{{ question.text|markdown|safe }}</div>
         <p>
           Ссылка на вопрос:
           <a href="{{ url_for('question_view', id=question.id, _external=True) }}">{{ url_for('question_view', id=question.id, _external=True) }}</a>
