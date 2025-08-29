@@ -2,6 +2,8 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, TextAreaField, URLField
 from wtforms.validators import DataRequired, Length, Optional
 from flask_ckeditor import CKEditorField
+from wtforms import PasswordField
+from wtforms.validators import EqualTo
 
 
 class QuestionForm(FlaskForm):
@@ -15,3 +17,17 @@ class QuestionForm(FlaskForm):
         validators=[DataRequired(message='Обязательное поле')]
     )
     submit = SubmitField('Добавить')
+
+
+class LoginForm(FlaskForm):
+    username = StringField('Логин', validators=[DataRequired()])
+    password = PasswordField('Пароль', validators=[DataRequired()])
+    submit = SubmitField('Войти')
+
+
+class RegistrationForm(FlaskForm):
+    username = StringField('Логин', validators=[DataRequired(), Length(3, 64)])
+    password = PasswordField('Пароль', validators=[DataRequired()])
+    password2 = PasswordField('Повторите пароль',
+                              validators=[DataRequired(), EqualTo('password')])
+    submit = SubmitField('Зарегистрироваться')

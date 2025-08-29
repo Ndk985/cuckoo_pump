@@ -1,10 +1,21 @@
 from random import randrange
+from functools import wraps
 
-from flask import abort, flash, redirect, render_template, url_for
+from flask import abort, flash, redirect, render_template, request, url_for
+from flask_login import login_user, logout_user, login_required, current_user
 
 from . import app, db
-from .forms import QuestionForm
-from .models import Question
+from .forms import LoginForm, QuestionForm, RegistrationForm
+from .models import Question, User
+
+
+def admin_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if not current_user.is_authenticated or not current_user.is_admin:
+            abort(403)
+        return f(*args, **kwargs)
+    return decorated
 
 
 def random_question():
@@ -24,6 +35,7 @@ def index_view():
 
 
 @app.route('/add', methods=['GET', 'POST'])
+@admin_required
 def add_question_view():
     form = QuestionForm()
     if form.validate_on_submit():
@@ -48,6 +60,7 @@ def question_view(id):
 
 
 @app.route('/questions/<int:id>/edit', methods=['GET', 'POST'])
+@admin_required
 def edit_question_view(id):
     question = Question.query.get_or_404(id)
 
@@ -61,3 +74,42 @@ def edit_question_view(id):
     return render_template('add_question.html',
                            form=form,
                            edit_mode=True)
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('index_view'))
+    form = LoginForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(username=form.username.data).first()
+        if user and user.check_password(form.password.data):
+            login_user(user)
+            return redirect(request.args.get('next') or url_for('index_view'))
+        flash('Неверный логин или пароль')
+    return render_template('login.html', form=form)
+
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    flash('Вы вышли из системы')
+    return redirect(url_for('index_view'))
+
+
+@app.route('/register', methods=['GET', 'POST'])
+# @login_required
+def register():
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        if User.query.filter_by(username=form.username.data).first():
+            flash('Такой пользователь уже существует')
+            return redirect(url_for('register'))
+        user = User(username=form.username.data, is_admin=False)
+        user.set_password(form.password.data)
+        db.session.add(user)
+        db.session.commit()
+        flash('Пользователь создан')
+        return redirect(url_for('login'))
+    return render_template('register.html', form=form)
