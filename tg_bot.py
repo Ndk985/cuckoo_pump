@@ -1,10 +1,10 @@
 import os
 import requests
+from markdownify import markdownify as md
 from telegram import Update
 from telegram.ext import Application, CommandHandler, ContextTypes
 from dotenv import load_dotenv
 load_dotenv()
-
 
 TOKEN = os.getenv("TG_BOT_TOKEN")
 FLASK_HOST = "http://127.0.0.1:5000"
@@ -21,8 +21,10 @@ async def random_question(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         r = requests.get(f"{FLASK_HOST}/api/get-random-question/", timeout=5)
         r.raise_for_status()
         data = r.json()["opinion"]
-        text = f"*{data['title']}*\n\n{data['text']}"
-        await update.message.reply_markdown(text)
+
+        # превращаем HTML из базы в Markdown Telegram
+        md_text = f"*{md(data['title']).strip()}*\n\n{md(data['text']).strip()}"
+        await update.message.reply_markdown(md_text)
     except Exception as e:
         await update.message.reply_text("Не удалось получить вопрос 😥")
 
