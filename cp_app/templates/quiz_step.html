@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Вопрос {{ n + 1 }} / 10{% endblock %}
+{% block content %}
+<div class="container my-5">
+  <h3>Вопрос {{ n + 1 }} из {{ session.quiz_total }}</h3>
+  <div class="markdown-body">{{ question.title|markdown|safe }}</div>
+
+  <form action="{{ url_for('quiz.quiz_reveal', n=n) }}" method="post" class="mt-4">
+    <button name="choice" value="know" class="btn btn-success me-2">Знаю ответ</button>
+    <button name="choice" value="dont" class="btn btn-danger">Не знаю ответ</button>
+  </form>
+</div>
+{% endblock %}

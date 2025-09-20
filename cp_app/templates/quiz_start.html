@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Квиз{% endblock %}
+{% block content %}
+<div class="container my-5 text-center">
+  <h1>Python-квиз: самопроверка за 10 вопросов</h1>
+  <p class="lead">Нажмите кнопку, чтобы начать.</p>
+  <form action="{{ url_for('quiz.quiz_begin') }}" method="post">
+    <button class="btn button btn-lg">Начать квиз</button>
+  </form>
+</div>
+{% endblock %}

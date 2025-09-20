@@ -7,6 +7,7 @@ from flask_login import login_user, logout_user, login_required, current_user
 from . import app, db
 from .forms import LoginForm, QuestionForm, RegistrationForm
 from .models import Question, User
+from .quiz import *   # noqa
 
 
 def admin_required(f):

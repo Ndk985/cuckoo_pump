@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Квиз завершён{% endblock %}
+{% block content %}
+<div class="container my-5 text-center">
+  <h1>Квиз завершён!</h1>
+  <p class="lead">Вы ответили на <strong>{{ correct }}</strong> из <strong>{{ total }}</strong> вопросов.</p>
+
+  <form action="{{ url_for('quiz.reset') }}" method="post">
+    <button class="btn button btn-lg">Пройти ещё раз</button>
+  </form>
+</div>
+{% endblock %}

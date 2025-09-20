@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Ответ{% endblock %}
+{% block content %}
+<div class="container my-5">
+  <h3>Ответ на вопрос {{ n + 1 }}</h3>
+
+  <!-- ВОПРОС -->
+  <div class="markdown-body">{{ question.title|markdown|safe }}</div>
+
+  <!-- ОТВЕТ -->
+  <div class="mt-4">
+    <h5>Ответ:</h5>
+    <div class="markdown-body">{{ question.text|markdown|safe }}</div>
+  </div>
+
+  <!-- КНОПКИ САМООЦЕНКИ -->
+  <form action="{{ url_for('quiz.quiz_mark', n=n) }}" method="post" class="mt-4">
+    <button name="mark" value="answered" class="btn btn-success me-2">Ответил</button>
+    <button name="mark" value="study" class="btn btn-danger">Нужно подучить</button>
+  </form>
+</div>
+{% endblock %}

@@ -64,4 +64,6 @@ def load_user(user_id):
 # ------------------------------------------------------------------
 from cp_app import models   # noqa: E402
 from cp_app import views    # noqa: E402
+from cp_app.quiz import quiz_bp
+app.register_blueprint(quiz_bp)
 from cp_app import api_views, cli_commands, error_handlers  # noqa: E402
