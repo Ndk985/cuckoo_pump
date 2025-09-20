@@ -11,9 +11,15 @@
           Ссылка на вопрос:
           <a href="{{ url_for('question_view', id=question.id, _external=True) }}">{{ url_for('question_view', id=question.id, _external=True) }}</a>
         </p>
+        {% if current_user.is_authenticated and current_user.is_admin %}
         <a class="button d-inline-block mt-3 px-4 py-2 text-decoration-none"
           href="{{ url_for('edit_question_view', id=question.id) }}">
             Редактировать вопрос
+        </a>
+        {% endif %}
+        <a class="button d-inline-block mt-3 px-4 py-2 text-decoration-none"
+          href="{{ url_for('random_question_page') }}">
+            Следующий вопрос
         </a>
       </div>
       <div class="col-12 col-lg-5">

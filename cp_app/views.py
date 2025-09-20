@@ -29,10 +29,7 @@ def random_question():
 
 @app.route('/')
 def index_view():
-    question = random_question()
-    if question is None:
-        abort(500)
-    return render_template('question.html', question=question)
+    return redirect(url_for('main_page'))
 
 
 @app.route('/add', methods=['GET', 'POST'])
@@ -114,3 +111,16 @@ def register():
         flash('Пользователь создан')
         return redirect(url_for('login'))
     return render_template('register.html', form=form)
+
+
+@app.route('/main')
+def main_page():
+    return render_template('main.html')
+
+
+@app.route('/random-question')
+def random_question_page():
+    question = random_question()   # вызываем ваш helper
+    if question is None:
+        abort(500)
+    return render_template('question.html', question=question)
