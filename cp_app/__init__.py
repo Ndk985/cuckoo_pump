@@ -41,6 +41,7 @@ ALLOWED_TAGS = [
     'h4', 'h5', 'h6', 'a'
 ]
 
+
 def md_to_html(text: str) -> str:
     md = markdown.Markdown(
         extensions=['codehilite', 'fenced_code', 'tables']
@@ -49,14 +50,17 @@ def md_to_html(text: str) -> str:
     safe_html = clean(html, tags=ALLOWED_TAGS, strip=True)
     return linkify(safe_html)
 
+
 app.jinja_env.filters['markdown'] = md_to_html
+
 
 # ------------------------------------------------------------------
 # 4.  user_loader (нужен для Flask-Login)
 # ------------------------------------------------------------------
 @login_manager.user_loader
 def load_user(user_id):
-    from cp_app.models import User   # импорт внутри функции, чтобы избежать кругового импорта
+    # импорт внутри функции, чтобы избежать кругового импорта
+    from cp_app.models import User
     return User.query.get(int(user_id))
 
 # ------------------------------------------------------------------

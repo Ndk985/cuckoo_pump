@@ -1,5 +1,8 @@
-from flask import Blueprint, abort, redirect, render_template, request, url_for, session
 from random import sample
+
+from flask import (
+     Blueprint, redirect, render_template, request, url_for, session
+)
 
 from cp_app.models import Question
 
