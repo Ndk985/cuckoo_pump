@@ -1,18 +1,21 @@
-FROM python:3.11-slim
+# Используем лёгкий python-образ
+FROM python:3.9-slim
 
+# Устанавливаем системные зависимости
+RUN apt-get update && apt-get install -y \
+    gcc libpq-dev build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+# Создаём рабочую директорию
 WORKDIR /app
 
-# системные зависимости + sqlite3 CLI (для отладки)
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    gcc libpq-dev sqlite3 && rm -rf /var/lib/apt/lists/*
-
+# Копируем requirements и устанавливаем зависимости
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Копируем проект
 COPY . .
 
-# создаём папку для volume (пустую)
-RUN mkdir -p /app/data
-
-# НЕ делаем upgrade здесь — volume ещё не примонтирован
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "wsgi:app"]
+# Flask запускаем через встроенный сервер (для dev).
+# Для продакшена лучше gunicorn, но оставим flask run для начала.
+CMD ["flask", "run", "--host=0.0.0.0", "--port=5000"]

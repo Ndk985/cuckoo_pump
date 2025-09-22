@@ -1,14 +1,30 @@
-version: "3.9"
-
 services:
   web:
     build: .
-    container_name: cuckoo-local
+    container_name: cuckoo_web
+    command: flask run --host=0.0.0.0 --port=5000
     ports:
-      - "8000:8000"
+      - "5000:5000"
     volumes:
-      - ./data:/app/data
-    env_file: .env
+      - ./cp_app:/app/cp_app
+      - ./instance:/app/instance
+    env_file:
+      - .env
+    depends_on:
+      - db
+
+  db:
+    image: postgres:14
+    container_name: cuckoo_db
+    restart: always
     environment:
-      - DATABASE_URL=sqlite:////app/data/db.sqlite3
-      - FLASK_ENV=production
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: cuckoo
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
+volumes:
+  pg_data:
