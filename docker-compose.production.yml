@@ -1,0 +1,39 @@
+version: '3.9'
+
+services:
+  db:
+    image: postgres:14
+    container_name: cuckoo_pump_db
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-cuckoo}
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
+  web:
+    image: ndk985/cuckoo_pump-web:latest
+    container_name: cuckoo_pump_web
+    restart: always
+    env_file:
+      - .env
+    expose:
+      - "8000"
+    depends_on:
+      - db
+    volumes:
+      - instance_data:/app/instance
+
+  gateway:
+    image: ndk985/cuckoo_pump-gateway:latest
+    container_name: cuckoo_pump_gateway
+    restart: always
+    ports:
+      - "8000:80"   # наружный порт сервера
+    depends_on:
+      - web
+
+volumes:
+  pg_data:
+  instance_data:
