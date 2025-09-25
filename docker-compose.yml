@@ -6,7 +6,7 @@ services:
     env_file:
       - .env
     expose:
-      - "8000"   # только для внутренней сети, без проброса наружу
+      - "8000"
     depends_on:
       - db
 

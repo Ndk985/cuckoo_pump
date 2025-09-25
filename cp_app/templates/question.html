@@ -5,7 +5,7 @@
   <section class="container my-5">
     <div class="row">
       <h1>{{ question.title }}</h1>
-      <div class="col-12 col-lg-7 my-5">
+      <div class="col-12">
         <div class="markdown-body">{{ question.text|markdown|safe }}</div>
         <p>
           Ссылка на вопрос:
@@ -21,9 +21,9 @@
           href="{{ url_for('random_question_page') }}">
             Следующий вопрос
         </a>
-      </div>
-      <div class="col-12 col-lg-5">
-        <img class="img-fluid mx-auto d-block" src="{{ url_for('static', filename='img/illustration.png') }}" alt="" />
+        <img class="img-fluid mx-auto d-block mt-4"
+             src="{{ url_for('static', filename='img/illustration.png') }}"
+             alt="Иллюстрация к вопросу">
       </div>
     </div>
   </section>
