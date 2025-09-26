@@ -2,43 +2,74 @@
     font-family: "Montserrat";
     src: local("Montserrat"),
       url(../fonts/Montserrat/Montserrat-VariableFont_wght.ttf);
-  }
+}
 
+/* CSS переменные для светлой темы (по умолчанию) */
+:root {
+    --bg-primary: #cea87d;
+    --text-primary: #272727;
+    --link-color: #272727;
+    --card-bg: transparent;
+    --border-color: #6e4a1f;
+}
+
+/* CSS переменные для темной темы */
+[data-theme="dark"] {
+    --bg-primary: #17262f;
+    --text-primary: #9b8585;
+    --link-color: #ae3a3a;
+    --card-bg: transparent;
+    --border-color: #6e4a1f;
+}
+
+/* Базовые стили */
 body {
     font-family: Montserrat, Arial, sans-serif;
-    background-color: #cea87d;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
     line-height: 1.2;
     letter-spacing: 0.01em;
-    color: #272727;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
+
 p, a {
     font-size: 20px;
 }
 
+/* Ссылки */
 a.nav-link, a {
-    color: #272727;
-
+    color: var(--link-color);
+    transition: color 0.3s ease;
 }
 
 a.nav-link:hover, a:hover {
     color: #e7390d;
 }
+
 .nav-pills a.nav-link.active {
     background-color: #c619af;
     border-radius: 20px;
 }
 
+/* Заголовки */
 h1 {
     font-size: 42px;
 }
 
+/* Текст с классами Bootstrap */
+.text-dark {
+    color: var(--text-primary) !important;
+}
+
+/* Мелкий текст */
 p.small {
     font-size: 18px;
     color: #8E8E8E;
 }
+
+/* Формы */
 .form-control-lg {
     border-radius: 20px;
-
 }
 
 .form-control:focus {
@@ -46,17 +77,19 @@ p.small {
     border-color: #c619af;
     outline: 0;
     box-shadow: 0 0 0 2px rgb(167, 17, 152);
-  }
+}
 
 textarea {
     resize: none;
 }
 
+/* Кнопки */
 .button {
     background-color: #e7390d;
     border-radius: 20px;
     color: #FFF;
     font-size: 20px;
+    transition: background-color 0.3s ease;
 }
 
 .button:hover {
@@ -64,8 +97,17 @@ textarea {
     color: #FFF;
 }
 
+/* Карточки */
+.card {
+    background-color: var(--card-bg);
+    transition: background-color 0.3s ease;
+}
 
+.border-dark-brown {
+    border-color: var(--border-color) !important;
+}
 
+/* Адаптивность */
 @media (max-width: 600px) {
     p {
         text-align: justify;
@@ -76,8 +118,4 @@ textarea {
     .navbar-brand {
         margin: 0 auto;
     }
-}
-
-.border-dark-brown {
-  border-color: #6e4a1f !important;   /* тёмно-коричневый */
 }

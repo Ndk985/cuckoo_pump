@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-theme="light">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -24,6 +24,10 @@
       {% block content %}{% endblock content %}
     </main>
     {% include "footer.html" %}
+    
+    <!-- Подключаем скрипт управления темами -->
+    <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+    
     {{ ckeditor.load() }}
   </body>
 </html>
