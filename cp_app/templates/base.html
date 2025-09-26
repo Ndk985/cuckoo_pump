@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru" data-theme="light">
+<html lang="ru">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -7,14 +7,30 @@
     <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='img/fav/apple-touch-icon.png') }}" />
     <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='img/fav/favicon-32x32.png') }}" />
     <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='img/fav/favicon-16x16.png') }}" />
+    
+    <!-- Inline скрипт для немедленной установки темы -->
+    <script>
+      // Применяем тему ДО загрузки CSS
+      (function() {
+        try {
+          const savedTheme = localStorage.getItem('theme') || 'light';
+          document.documentElement.setAttribute('data-theme', savedTheme);
+        } catch (e) {
+          console.log('Theme initialization error:', e);
+        }
+      })();
+    </script>
+    
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}" />
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
     <style>
-      main { flex: 1 0 auto; }   /* основной блок растягивается, выталкивая футер вниз */
+      main { flex: 1 0 auto; }
+      /* Плавные переходы только для интерактивных изменений */
+      body {
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
     </style>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.2.0/github-markdown.min.css"> -->
-    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css"> -->
     <title>{% block title %}Качаем кукуху!{% endblock title %}</title>
   </head>
 
@@ -25,7 +41,7 @@
     </main>
     {% include "footer.html" %}
     
-    <!-- Подключаем скрипт управления темами -->
+    <!-- Основной скрипт темы -->
     <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
     
     {{ ckeditor.load() }}
