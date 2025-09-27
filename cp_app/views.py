@@ -124,3 +124,12 @@ def random_question_page():
     if question is None:
         abort(500)
     return render_template('question.html', question=question)
+
+
+@app.route('/questions')
+def all_questions():
+    page = request.args.get('page', 1, type=int)  # текущая страница, по умолчанию 1
+    per_page = 20  # вопросов на страницу
+    pagination = Question.query.order_by(Question.id).paginate(page=page, per_page=per_page)
+    questions = pagination.items
+    return render_template('questions_list.html', questions=questions, pagination=pagination)
