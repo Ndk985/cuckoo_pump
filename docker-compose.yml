@@ -29,6 +29,15 @@ services:
       - "8000:80"   # наружу отдаём только nginx
     depends_on:
       - web
+  bot:
+    build: .
+    container_name: cuckoo_pump_bot
+    restart: always
+    env_file:
+      - .env
+    command: python tg_bot.py
+    depends_on:
+      - web
 
 volumes:
   pg_data:
