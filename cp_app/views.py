@@ -128,8 +128,12 @@ def random_question_page():
 
 @app.route('/questions')
 def all_questions():
-    page = request.args.get('page', 1, type=int)  # текущая страница, по умолчанию 1
-    per_page = 20  # вопросов на страницу
-    pagination = Question.query.order_by(Question.id).paginate(page=page, per_page=per_page)
+    page = request.args.get('page', 1, type=int)
+    per_page = 20
+    pagination = Question.query.order_by(Question.id).paginate(
+        page=page, per_page=per_page
+    )
     questions = pagination.items
-    return render_template('questions_list.html', questions=questions, pagination=pagination)
+    return render_template(
+        'questions_list.html', questions=questions, pagination=pagination
+    )

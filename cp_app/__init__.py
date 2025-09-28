@@ -6,7 +6,7 @@ from flask_login import LoginManager
 from flask_ckeditor import CKEditor
 from settings import Config
 import markdown
-from bleach import clean, linkify
+from bleach import clean
 
 # ------------------------------------------------------------------
 # 0.  Создаём глобальные объекты расширений
@@ -48,7 +48,7 @@ def md_to_html(text: str) -> str:
     )
     html = md.convert(text)
     safe_html = clean(html, tags=ALLOWED_TAGS, strip=True)
-    return linkify(safe_html)
+    return safe_html
 
 
 app.jinja_env.filters['markdown'] = md_to_html
