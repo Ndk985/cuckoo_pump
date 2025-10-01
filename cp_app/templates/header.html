@@ -14,6 +14,9 @@
             <a class="nav-link" href="{{ url_for('main_page') }}">Главная</a>
           </li>
           <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('all_questions') }}"><strong>{{ question_count }}</strong> {{ question_word }} в БД</a>
+          </li>
+          <li class="nav-item">
             <a class="nav-link" href="{{ url_for('quiz.quiz_start') }}">Квиз</a>
           </li>
           

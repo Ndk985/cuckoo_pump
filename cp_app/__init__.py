@@ -71,3 +71,22 @@ from cp_app import views    # noqa: E402
 from cp_app.quiz import quiz_bp
 app.register_blueprint(quiz_bp)
 from cp_app import api_views, cli_commands, error_handlers  # noqa: E402
+from cp_app.models import Question
+
+
+@app.context_processor
+def inject_counts():
+    count = Question.query.count()
+    # склоняем слово "вопрос"
+    last_two = count % 100
+    if 11 <= last_two <= 14:
+        word = "вопросов"
+    else:
+        rem = count % 10
+        if rem == 1:
+            word = "вопрос"
+        elif 2 <= rem <= 4:
+            word = "вопроса"
+        else:
+            word = "вопросов"
+    return dict(question_count=count, question_word=word)
