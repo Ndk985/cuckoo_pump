@@ -13,7 +13,7 @@
 - содержит соло-квиз из 10 неповторяющихся вопросов с механизмом самооценки.
 
 ## Техно-стек ##
-Python 3.9, Flask, SQLAlchemy, Alembic, SQLite, Bootstrap, python-telegram-bot
+Python 3.9, Flask, SQLAlchemy, Alembic, SQLite, Bootstrap, python-telegram-bot, CI/CD GitHub Actions
 
 **Команды развертывания**
 ```bash
@@ -80,3 +80,17 @@ TG_BOT_TOKEN.
 Bootstrap 5 + кастомные цвета в style.css.
 Шрифт Montserrat.
 Через CKEditor можно вставлять код, списки, цитаты — при выводе всё превращается в красивый HTML-разметкой |markdown|safe.
+
+## CI/CD
+
+Проект использует **GitHub Actions** для непрерывной интеграции и деплоя.  
+При каждом пуше в ветку `main`:
+
+1. Автоматически собирается Docker-образ `web`
+2. Образ публикуется в Docker Hub.
+3. На production-сервере через SSH выполняются:
+   - `docker compose pull`  
+   - `docker compose down`  
+   - `docker compose up -d`
+
+Файл рабочего процесса: [`.github/workflows/main.yml`](.github/workflows/main.yml)
