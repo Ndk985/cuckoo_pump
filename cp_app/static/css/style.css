@@ -118,3 +118,9 @@ textarea {
         margin: 0 auto;
     }
 }
+
+/* Подсветка вопросов-ссылок такая же, как у кнопок хедера */
+.list-group-item a:hover {
+    color: #e7390d !important;   /* ваш оранжевый из a.nav-link:hover */
+    transition: color 0.3s ease;
+}
