@@ -13,7 +13,7 @@
 - содержит соло-квиз из 10 неповторяющихся вопросов с механизмом самооценки.
 
 ## Техно-стек ##
-Python 3.9, Flask, SQLAlchemy, Alembic, SQLite, Bootstrap, python-telegram-bot, CI/CD GitHub Actions
+Python 3.9, Flask, SQLAlchemy, Alembic, SQLite, Bootstrap, python-telegram-bot, CI/CD GitHub Actions, Paramiko
 
 **Команды развертывания**
 ```bash
@@ -81,7 +81,7 @@ Bootstrap 5 + кастомные цвета в style.css.
 Шрифт Montserrat.
 Через CKEditor можно вставлять код, списки, цитаты — при выводе всё превращается в красивый HTML-разметкой |markdown|safe.
 
-## CI/CD
+## CI/CD ##
 
 Проект использует **GitHub Actions** для непрерывной интеграции и деплоя.  
 При каждом пуше в ветку `main`:
@@ -94,3 +94,12 @@ Bootstrap 5 + кастомные цвета в style.css.
    - `docker compose up -d`
 
 Файл рабочего процесса: [`.github/workflows/main.yml`](.github/workflows/main.yml)
+
+## Автоматическое резервное копирование БД ##
+
+Для удобного резервного копирования базы данных PostgreSQL на сервере реализован скрипт db_backup.py.
+Скрипт создаёт дамп БД в контейнере Docker, скачивает его локально и, при желании, удаляет с сервера.
+
+Особенности:
+
+Имя файла автоматически формируется по дате: backup_YYYY-MM-DD.sql.
