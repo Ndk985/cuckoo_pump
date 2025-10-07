@@ -1,10 +1,10 @@
 name: Cuckoo Pump Workflow
 
-# on:
-#   push:
-#     branches:
-#       - main
-  workflow_dispatch:
+on:
+  push:
+    branches:
+      - main
+  # workflow_dispatch:
 
 jobs:
   build_web_and_push:
@@ -62,3 +62,17 @@ jobs:
             sudo docker compose -f docker-compose.production.yml down
             sudo docker compose -f docker-compose.production.yml up -d
             sleep 20
+
+      - name: Run migrations
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USER }}
+          key: ${{ secrets.SSH_KEY }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
+          script: |
+            cd cuckoo_pump
+            # ждём, пока web действительно поднимется
+            timeout 60 bash -c 'until sudo docker compose -f docker-compose.production.yml exec -T web flask db current; do sleep 2; done'
+            # применяем миграции
+            sudo docker compose -f docker-compose.production.yml exec -T web flask db upgrade
