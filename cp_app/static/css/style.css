@@ -124,3 +124,43 @@ textarea {
     color: #e7390d !important;   /* ваш оранжевый из a.nav-link:hover */
     transition: color 0.3s ease;
 }
+
+/* ======  Блок добавления комментария  ====== */
+.comment-box {
+    background-color: transparent !important;
+    border: 1px solid rgba(var(--bs-body-color-rgb), 0.25);
+    border-radius: 0.375rem;
+    padding: 1rem;
+    color: var(--bs-body-color);   /* автоматически меняется при переключении темы */
+}
+
+/* ======  Список комментариев  ====== */
+.comment-item {
+    background-color: transparent !important;
+    border: 1px solid rgba(var(--bs-body-color-rgb), 0.2);
+    border-left: 3px solid var(--bs-primary);
+    margin-bottom: 0.75rem;
+    padding: 0.75rem 1rem;
+    color: var(--bs-body-color);
+}
+
+/* цвет подписи «username» */
+.comment-item .small {
+    color: var(--bs-secondary-color);   /* bootstrap-5 переменная тоже автоматически переключается */
+}
+
+/* цвет рамки, как у карточек на главной */
+.border-dark-brown {
+  border-color: #8b4513 !important;   /* подмени на свою переменную, если она уже объявлена */
+}
+
+/* левая акцент-полоса = той же толщины и цвета, что и внешняя рамка */
+.comment-line {
+  border-left: 6px solid #8b4513 !important; /* та же «тёмно-коричневая» палитра */
+}
+
+/* цвет текста в поле комментария в момент набора */
+textarea.form-control.comment-input {
+  color: var(--bs-body-color) !important;        /* подхватывает light / dark */
+  background-color: transparent !important;
+}

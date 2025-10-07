@@ -1,56 +1,81 @@
-{% extends "base.html" %} 
-{% block title %}Вопрос о Python # {{ question.id }}{%endblock %} 
+{% extends "base.html" %}
+{% block title %}Вопрос о Python #{{ question.id }}{% endblock %}
+
 {% block content %}
 <main>
   <section class="container my-5">
     <div class="row">
-      <h1>{{ question.title }}</h1>
       <div class="col-12">
-        <div class="markdown-body">{{ question.text|markdown|safe }}</div>
-        <p>
+        <h1>{{ question.title }}</h1>
+
+        <div class="markdown-body mb-3">
+          {{ question.text|markdown|safe }}
+        </div>
+
+        {# мета-ссылка #}
+        <p class="small">
           Ссылка на вопрос:
-          <a href="{{ url_for('question_view', id=question.id, _external=True) }}">{{ url_for('question_view', id=question.id, _external=True) }}</a>
+          <a href="{{ url_for('question_view', id=question.id, _external=True) }}">
+            {{ url_for('question_view', id=question.id, _external=True) }}
+          </a>
         </p>
-        {% if current_user.is_authenticated and current_user.is_admin %}
-        <a class="button d-inline-block mt-3 px-4 py-2 text-decoration-none"
-          href="{{ url_for('edit_question_view', id=question.id) }}">
-            Редактировать вопрос
-        </a>
-        {% endif %}
-        <a class="button d-inline-block mt-3 px-4 py-2 text-decoration-none"
-          href="{{ url_for('random_question_page') }}">
+
+        {# кнопки в старом дизайне #}
+        <div class="d-flex flex-wrap gap-2 mb-4">
+          {% if current_user.is_authenticated and current_user.is_admin %}
+            <a class="button d-inline-block mt-3 px-4 py-2 text-decoration-none"
+               href="{{ url_for('edit_question_view', id=question.id) }}">
+              Редактировать вопрос
+            </a>
+          {% endif %}
+          <a class="button d-inline-block mt-3 px-4 py-2 text-decoration-none"
+             href="{{ url_for('random_question_page') }}">
             Следующий вопрос
-        </a>
-        <img class="img-fluid mx-auto d-block mt-4"
-             src="{{ url_for('static', filename='img/illustration.png') }}"
-             alt="Иллюстрация к вопросу">
+          </a>
+        </div>
+
+        {# блок комментариев #}
         <hr>
         <h4>Комментарии</h4>
 
         {% if current_user.is_authenticated %}
-          <form method="POST" action="{{ url_for('question_view', id=question.id) }}">
-            {{ form.hidden_tag() }}
-            <div class="mb-3">
-              {{ form.text(class="form-control") }}
-            </div>
-            <button type="submit" class="btn btn-primary">Отправить</button>
-          </form>
+          {# --------------  форма без внешней рамки  -------------- #}
+          <div class="mb-4">
+            <form method="POST" action="{{ url_for('question_view', id=question.id) }}">
+              {{ form.hidden_tag() }}
+
+              {# поле ввода – теперь с коричневой рамкой #}
+              {{ form.text(class="form-control comment-input border-2 border-dark-brown rounded-2") }}
+
+              <button type="submit"
+                      class="button d-inline-block mt-3 px-4 py-2 text-decoration-none">
+                Отправить
+              </button>
+            </form>
+          </div>
         {% else %}
           <p><a href="{{ url_for('login') }}">Войдите</a>, чтобы оставить комментарий.</p>
         {% endif %}
 
-        <ul class="list-group mt-4">
+        {# список комментариев #}
+        <ul class="list-unstyled">
           {% for comment in comments %}
-            <li class="list-group-item">
-              <strong>{{ comment.user.username }}</strong> <small class="text-muted">{{ comment.timestamp.strftime('%d.%m.%Y %H:%M') }}</small>
-              <div>{{ comment.text|markdown|safe }}</div>
+            <li class="card bg-transparent border border-2 border-dark-brown rounded-3 shadow-sm comment-line mb-3">
+              <div class="card-body">
+                <strong>{{ comment.user.username }}</strong>
+                <small class="text-muted ms-2">{{ comment.timestamp.strftime('%d.%m.%Y %H:%M') }}</small>
+                <div class="mt-2">{{ comment.text|markdown|safe }}</div>
+              </div>
             </li>
           {% else %}
-            <li class="list-group-item">Пока нет комментариев.</li>
+            <li class="text-center text-muted">Пока нет комментариев.</li>
           {% endfor %}
         </ul>
-      
-      
+
+        {# иллюстрация в самом конце #}
+        <img class="img-fluid mx-auto d-block mt-5"
+             src="{{ url_for('static', filename='img/illustration.png') }}"
+             alt="Иллюстрация к вопросу">
       </div>
     </div>
   </section>
