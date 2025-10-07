@@ -2,7 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired, Length
 from flask_ckeditor import CKEditorField
-from wtforms import PasswordField
+from wtforms import PasswordField, TextAreaField
 from wtforms.validators import EqualTo
 
 
@@ -31,3 +31,16 @@ class RegistrationForm(FlaskForm):
     password2 = PasswordField('Повторите пароль',
                               validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Зарегистрироваться')
+
+
+class CommentForm(FlaskForm):
+    text = TextAreaField(
+        'Комментарий',
+        validators=[DataRequired()],
+        render_kw={
+            "class": "form-control",
+            "rows": 4,
+            "placeholder": "Напишите ваш комментарий..."
+        }
+    )
+    submit = SubmitField('Отправить')

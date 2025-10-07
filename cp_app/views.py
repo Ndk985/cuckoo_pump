@@ -5,8 +5,8 @@ from flask import abort, flash, redirect, render_template, request, url_for
 from flask_login import login_user, logout_user, login_required, current_user
 
 from . import app, db
-from .forms import LoginForm, QuestionForm, RegistrationForm
-from .models import Question, User
+from .forms import LoginForm, QuestionForm, RegistrationForm, CommentForm
+from .models import Question, User, Comment
 from .quiz import *   # noqa
 
 
@@ -51,10 +51,32 @@ def add_question_view():
     return render_template('add_question.html', form=form)
 
 
-@app.route('/questions/<int:id>')
+@app.route('/questions/<int:id>', methods=['GET', 'POST'])
 def question_view(id):
     question = Question.query.get_or_404(id)
-    return render_template('question.html', question=question)
+    form = CommentForm()
+
+    if form.validate_on_submit():
+        if not current_user.is_authenticated:
+            flash('Войдите, чтобы оставить комментарий')
+            return redirect(url_for('login'))
+
+        comment = Comment(
+            text=form.text.data,
+            user_id=current_user.id,
+            question_id=question.id
+        )
+        db.session.add(comment)
+        db.session.commit()
+        flash('Комментарий добавлен')
+        return redirect(url_for('question_view', id=id))
+
+    comments = Comment.query.filter_by(question_id=id).order_by(
+        Comment.timestamp.desc()
+    ).all()
+    return render_template(
+        'question.html', question=question, form=form, comments=comments
+    )
 
 
 @app.route('/questions/<int:id>/edit', methods=['GET', 'POST'])
@@ -120,10 +142,20 @@ def main_page():
 
 @app.route('/random-question')
 def random_question_page():
-    question = random_question()   # вызываем ваш helper
+    question = random_question()
     if question is None:
         abort(500)
-    return render_template('question.html', question=question)
+
+    from .forms import CommentForm
+    form = CommentForm()
+    comments = Comment.query.filter_by(question_id=question.id)\
+                            .order_by(Comment.timestamp.desc()).all()
+    return render_template(
+        'question.html',
+        question=question,
+        form=form,
+        comments=comments
+    )
 
 
 @app.route('/questions')
