@@ -169,3 +169,22 @@ def all_questions():
     return render_template(
         'questions_list.html', questions=questions, pagination=pagination
     )
+
+
+@app.context_processor
+def inject_news():
+    # последние 5 вопросов
+    latest_questions = Question.query.order_by(
+        Question.id.desc()
+    ).limit(5).all()
+    # последние 5 комментариев с JOIN пользователей и вопросов
+    latest_comments = (
+        db.session.query(Comment, User.username, Question.title, Question.id)
+        .join(User).join(Question)
+        .order_by(Comment.timestamp.desc())
+        .limit(3)
+        .all()
+    )
+    return dict(
+        latest_questions=latest_questions, latest_comments=latest_comments
+    )

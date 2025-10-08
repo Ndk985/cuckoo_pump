@@ -11,6 +11,61 @@
     </p>
   </div>
 
+  <!-- Что нового -->
+  <div class="row justify-content-center mb-5">
+    <div class="col-12 col-lg-10">
+      <h3 class="fw-bold text-center mb-4">Что нового:</h3>
+
+      <div class="row g-4">
+        <!-- последние вопросы -->
+        <div class="col-md-6">
+          <div class="card bg-transparent border-2 border-dark-brown rounded-3 shadow-sm h-100">
+            <div class="card-body">
+              <h5 class="card-title"><i class="bi bi-patch-question"></i> Новые вопросы</h5>
+              <ul class="list-unstyled mb-0">
+                {% for q in latest_questions %}
+                  <li class="mb-2">
+                    <a class="link-body-emphasis" href="{{ url_for('question_view', id=q.id) }}">
+                      {{ q.title }}
+                    </a>
+                    <small class="text-muted d-block">#{{ q.id }}</small>
+                  </li>
+                {% else %}
+                  <li class="text-muted">Пока нет новых вопросов.</li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- последние комментарии -->
+        <div class="col-md-6">
+          <div class="card bg-transparent border-2 border-dark-brown rounded-3 shadow-sm h-100">
+            <div class="card-body">
+              <h5 class="card-title"><i class="bi bi-chat-text"></i> Свежие комментарии</h5>
+              <ul class="list-unstyled mb-0">
+                {% for comm, author, q_title, q_id in latest_comments %}
+                  <li class="mb-2">
+                    <div class="small">
+                      <strong>{{ author }}</strong> к
+                      <a class="link-body-emphasis" href="{{ url_for('question_view', id=q_id) }}">
+                        «{{ q_title }}»
+                      </a>
+                    </div>
+                    <div class="text-truncate-3">{{ comm.text|markdown|safe }}</div>
+                    <small class="text-muted">{{ comm.timestamp.strftime('%d.%m.%Y %H:%M') }}</small>
+                  </li>
+                {% else %}
+                  <li class="text-muted">Комментариев пока нет.</li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Карточки-переходы -->
   <div class="row g-4 justify-content-center">
     <!-- Квиз -->
