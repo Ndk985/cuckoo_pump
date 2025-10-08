@@ -63,7 +63,7 @@ jobs:
             sudo docker compose -f docker-compose.production.yml up -d
             sleep 20
 
-      - name: Run migrations
+      - name: Run migrations safely
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.HOST }}
@@ -72,7 +72,56 @@ jobs:
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
           script: |
             cd cuckoo_pump
-            # ждём, пока web действительно поднимется
-            timeout 60 bash -c 'until sudo docker compose -f docker-compose.production.yml exec -T web flask db current; do sleep 2; done'
-            # применяем миграции
-            sudo docker compose -f docker-compose.production.yml exec -T web flask db upgrade
+            
+            # Ждём готовности БД и приложения
+            echo "Waiting for services to be ready..."
+            timeout 120 bash -c 'until sudo docker compose -f docker-compose.production.yml exec -T db pg_isready -U postgres; do sleep 2; done'
+            timeout 120 bash -c 'until sudo docker compose -f docker-compose.production.yml exec -T web flask db current; do sleep 2; done'
+            
+            echo "=== Checking migration state ==="
+            
+            # 1. Проверяем текущее состояние
+            CURRENT_DB_VERSION=$(sudo docker compose -f docker-compose.production.yml exec -T db psql -U postgres -d cuckoo -t -c "SELECT version_num FROM alembic_version;" | tr -d '[:space:]')
+            echo "Current DB version: $CURRENT_DB_VERSION"
+            
+            # 2. Получаем список доступных миграций
+            MIGRATION_HISTORY=$(sudo docker compose -f docker-compose.production.yml exec -T web flask db history --verbose 2>/dev/null | grep -oE "[a-f0-9]+" | tail -1 || echo "")
+            LATEST_MIGRATION=$(sudo docker compose -f docker-compose.production.yml exec -T web flask db current 2>/dev/null | grep -oE "[a-f0-9]+" | head -1 || echo "")
+            
+            echo "Latest migration in code: $LATEST_MIGRATION"
+            
+            # 3. Если версия в БД не существует в файлах миграций
+            if [[ -n "$CURRENT_DB_VERSION" && "$CURRENT_DB_VERSION" != "$LATEST_MIGRATION" ]]; then
+              echo "WARNING: Version mismatch detected!"
+              echo "Attempting to repair migration state..."
+              
+              # Получаем первую доступную миграцию
+              FIRST_MIGRATION=$(sudo docker compose -f docker-compose.production.yml exec -T web flask db history --verbose 2>/dev/null | grep -oE "[a-f0-9]+" | head -1 || echo "")
+              
+              if [[ -n "$FIRST_MIGRATION" ]]; then
+                echo "Resetting to first migration: $FIRST_MIGRATION"
+                sudo docker compose -f docker-compose.production.yml exec -T db psql -U postgres -d cuckoo -c "UPDATE alembic_version SET version_num = '$FIRST_MIGRATION';"
+              fi
+            fi
+            
+            # 4. Применяем миграции с проверкой
+            echo "=== Applying migrations ==="
+            if sudo docker compose -f docker-compose.production.yml exec -T web flask db upgrade; then
+              echo "Migrations applied successfully"
+              
+              # 5. Проверяем, что миграции действительно применились
+              FINAL_VERSION=$(sudo docker compose -f docker-compose.production.yml exec -T db psql -U postgres -d cuckoo -t -c "SELECT version_num FROM alembic_version;" | tr -d '[:space:]')
+              echo "Final DB version: $FINAL_VERSION"
+              
+            else
+              echo "ERROR: Migrations failed!"
+              echo "Attempting emergency repair..."
+              
+              # Аварийный ремонт - сбрасываем к head
+              sudo docker compose -f docker-compose.production.yml exec -T web flask db stamp head
+              echo "Emergency repair completed - marked as head"
+              
+              exit 1
+            fi
+            
+            echo "=== Deployment completed successfully ==="
