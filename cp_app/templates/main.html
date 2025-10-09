@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% block title %}Сuckoo_pump{% endblock %}
+
 {% block content %}
 <div class="container my-5">
   <!-- Заголовок -->
@@ -26,9 +27,11 @@
                 {% for q in latest_questions %}
                   <li class="mb-2">
                     <a class="link-body-emphasis" href="{{ url_for('question_view', id=q.id) }}">
-                      {{ q.title }}
+                      {{ q.title|truncate(45, killwords=True, end='…') }}
                     </a>
-                    <small class="text-muted d-block">#{{ q.id }}</small>
+                    <small class="text-muted d-block">
+                      {{ q.text|striptags|truncate(70, killwords=True, end='…') }}
+                    </small>
                   </li>
                 {% else %}
                   <li class="text-muted">Пока нет новых вопросов.</li>
@@ -49,10 +52,12 @@
                     <div class="small">
                       <strong>{{ author }}</strong> к
                       <a class="link-body-emphasis" href="{{ url_for('question_view', id=q_id) }}">
-                        «{{ q_title }}»
+                        «{{ q_title|truncate(45, killwords=True, end='…') }}»
                       </a>
                     </div>
-                    <div class="text-truncate-3">{{ comm.text|markdown|safe }}</div>
+                    <div class="text-truncate-3">
+                      {{ comm.text|striptags|truncate(45, killwords=True, end='…') }}
+                    </div>
                     <small class="text-muted">{{ comm.timestamp.strftime('%d.%m.%Y %H:%M') }}</small>
                   </li>
                 {% else %}
