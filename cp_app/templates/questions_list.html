@@ -1,7 +1,23 @@
 {% extends "base.html" %}
 {% block title %}Список всех вопросов{% endblock %}
+
 {% block content %}
 <div class="container my-5">
+
+  <!-- Поиск -->
+  <form method="get" class="mb-4">
+    <div class="input-group">
+      <input type="text"
+            name="search"
+            value="{{ search }}"
+            class="form-control bg-transparent text-body border-2 border-dark-brown rounded-2"
+            placeholder="Поиск по вопросам…"
+            aria-label="Поиск по вопросам">
+      <button class="btn btn-outline-secondary border-2 border-dark-brown text-body"
+              type="submit">Искать</button>
+    </div>
+  </form>
+
   <h2 class="mb-4 text-dark">Список всех вопросов</h2>
 
   <!-- Список вопросов -->
@@ -10,43 +26,52 @@
       <li class="list-group-item d-flex justify-content-between align-items-center"
           style="background-color: transparent; border: none;">
         <a href="{{ url_for('question_view', id=question.id) }}" class="text-decoration-none text-dark">
-          {{ question.id }}. {{ question.title }}
+          {{ question.id }}. {{ question.title|truncate(80, killwords=True, end='…') }}
         </a>
+      </li>
+    {% else %}
+      <li class="list-group-item bg-transparent border-0" style="color: var(--text-primary);">
+        Ничего не найдено.
       </li>
     {% endfor %}
   </ul>
 
-  <!-- Пагинация -->
+  <!-- Пагинация (ссылки и кнопки теперь используют text-body) -->
   <nav aria-label="Page navigation">
     <ul class="pagination justify-content-center" style="background-color: transparent; border: none;">
       {% if pagination.has_prev %}
         <li class="page-item">
-          <a class="page-link" href="{{ url_for('all_questions', page=pagination.prev_num) }}"
-             style="background-color: transparent; border: none;">« Назад</a>
+          <a class="page-link bg-transparent text-body border-2 border-dark-brown rounded-2"
+            href="{{ url_for('all_questions', page=pagination.prev_num, search=search) }}">« Назад</a>
         </li>
       {% else %}
-        <li class="page-item disabled"><span class="page-link" style="background-color: transparent; border: none;">« Назад</span></li>
+        <li class="page-item disabled">
+          <span class="page-link bg-transparent text-body border-2 border-dark-brown rounded-2">« Назад</span>
+        </li>
       {% endif %}
 
       {% for p in range(1, pagination.pages + 1) %}
         {% if p == pagination.page %}
           <li class="page-item active">
-            <span class="page-link" style="background-color: transparent; border: none;">{{ p }}</span>
+            <span class="page-link bg-transparent text-body border-2 border-dark-brown rounded-2">{{ p }}</span>
           </li>
         {% else %}
           <li class="page-item">
-            <a class="page-link" href="{{ url_for('all_questions', page=p) }}" style="background-color: transparent; border: none;">{{ p }}</a>
+            <a class="page-link bg-transparent text-body border-2 border-dark-brown rounded-2"
+              href="{{ url_for('all_questions', page=p, search=search) }}">{{ p }}</a>
           </li>
         {% endif %}
       {% endfor %}
 
       {% if pagination.has_next %}
         <li class="page-item">
-          <a class="page-link" href="{{ url_for('all_questions', page=pagination.next_num) }}"
-             style="background-color: transparent; border: none;">Вперед »</a>
+          <a class="page-link bg-transparent text-body border-2 border-dark-brown rounded-2"
+            href="{{ url_for('all_questions', page=pagination.next_num, search=search) }}">Вперед »</a>
         </li>
       {% else %}
-        <li class="page-item disabled"><span class="page-link" style="background-color: transparent; border: none;">Вперед »</span></li>
+        <li class="page-item disabled">
+          <span class="page-link bg-transparent text-body border-2 border-dark-brown rounded-2">Вперед »</span>
+        </li>
       {% endif %}
     </ul>
   </nav>

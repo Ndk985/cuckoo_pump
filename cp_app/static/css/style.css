@@ -172,3 +172,48 @@ textarea.form-control.comment-input {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+/* === переопределяем Bootstrap-переменные === */
+:root, [data-theme="light"] {
+  --bs-body-color: #272727;          /* ваш светлый текст */
+  --bs-secondary-color: #6c757d;     /* мелкий текст / placeholder */
+}
+
+[data-theme="dark"] {
+  --bs-body-color: #9b8585;          /* ваш тёмный текст */
+  --bs-secondary-color: #9b8585;     /* тот же для placeholder */
+}
+
+/* === кнопки / ссылки пагинации === */
+.page-link, .btn-outline-secondary {
+  color: var(--bs-body-color) !important;
+  border-color: var(--border-color) !important;
+}
+.page-link:hover, .btn-outline-secondary:hover {
+  color: var(--bs-body-color) !important;
+  background-color: transparent !important;
+}
+
+/* === цвет текста и placeholder внутри input === */
+.form-control,
+.form-control:focus {
+  background-color: transparent !important;
+  color: var(--bs-body-color) !important;
+  border-color: var(--border-color) !important;
+}
+
+/* placeholder тоже должен переключаться */
+.form-control::placeholder {
+  color: var(--bs-secondary-color) !important;
+  opacity: 1;           /* Firefox снижает opacity по умолчанию */
+}
+
+/* кнопка «Искать» */
+.btn-outline-secondary {
+  color: var(--bs-body-color) !important;
+  border-color: var(--border-color) !important;
+}
+.btn-outline-secondary:hover {
+  background-color: transparent !important;
+  color: var(--bs-body-color) !important;
+}

@@ -3,6 +3,7 @@ from functools import wraps
 
 from flask import abort, flash, redirect, render_template, request, url_for
 from flask_login import login_user, logout_user, login_required, current_user
+from sqlalchemy import or_
 
 from . import app, db
 from .forms import LoginForm, QuestionForm, RegistrationForm, CommentForm
@@ -162,12 +163,23 @@ def random_question_page():
 def all_questions():
     page = request.args.get('page', 1, type=int)
     per_page = 20
-    pagination = Question.query.order_by(Question.id).paginate(
-        page=page, per_page=per_page
-    )
-    questions = pagination.items
+    search = request.args.get('search', '', type=str).strip()
+
+    query = Question.query
+    if search:
+        search_filter = or_(
+            Question.title.ilike(f'%{search}%'),
+            Question.text.ilike(f'%{search}%')
+        )
+        query = query.filter(search_filter)
+
+    pagination = query.order_by(
+        Question.id).paginate(page=page, per_page=per_page)
     return render_template(
-        'questions_list.html', questions=questions, pagination=pagination
+        'questions_list.html',
+        questions=pagination.items,
+        pagination=pagination,
+        search=search
     )
 
 
