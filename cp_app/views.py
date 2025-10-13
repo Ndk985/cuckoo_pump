@@ -103,11 +103,14 @@ def login():
         return redirect(url_for('index_view'))
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(username=form.username.data).first()
+        # ищем по email или username
+        login = form.login.data.lower()
+        user = (User.query.filter_by(email=login).first() or
+                User.query.filter_by(username=login).first())
         if user and user.check_password(form.password.data):
             login_user(user)
             return redirect(request.args.get('next') or url_for('index_view'))
-        flash('Неверный логин или пароль')
+        flash('Неверный username/email или пароль')
     return render_template('login.html', form=form)
 
 
@@ -120,14 +123,19 @@ def logout():
 
 
 @app.route('/register', methods=['GET', 'POST'])
-# @login_required
 def register():
     form = RegistrationForm()
     if form.validate_on_submit():
+        # уникальность username
         if User.query.filter_by(username=form.username.data).first():
             flash('Такой пользователь уже существует')
             return redirect(url_for('register'))
-        user = User(username=form.username.data, is_admin=False)
+
+        user = User(
+            username=form.username.data,
+            email=form.email.data.lower() if form.email.data else None,
+            is_admin=False
+        )
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
