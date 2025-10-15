@@ -44,6 +44,9 @@ login_manager = LoginManager()
 app = Flask(__name__)
 app.config.from_object(Config)
 
+from werkzeug.middleware.proxy_fix import ProxyFix
+app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
+
 # ------------------------------------------------------------------
 # 3.  Инициализируем расширения
 # ------------------------------------------------------------------
