@@ -66,13 +66,16 @@ ALLOWED_TAGS = [
     'h4', 'h5', 'h6', 'a'
 ]
 
+
 def md_to_html(text: str) -> str:
     md = markdown.Markdown(extensions=['codehilite', 'fenced_code', 'tables'])
     html = md.convert(text)
     safe_html = clean(html, tags=ALLOWED_TAGS, strip=True)
     return safe_html
 
+
 app.jinja_env.filters['markdown'] = md_to_html
+app.jinja_env.filters['zip'] = zip
 
 # ------------------------------------------------------------------
 # 5.  user_loader (нужен для Flask-Login)
@@ -91,6 +94,7 @@ from cp_app.quiz import quiz_bp
 app.register_blueprint(quiz_bp)
 from cp_app import api_views, cli_commands, error_handlers  # noqa: E402
 from cp_app.models import Question
+
 
 @app.context_processor
 def inject_counts():

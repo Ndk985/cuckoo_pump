@@ -1,12 +1,32 @@
 {% extends "base.html" %}
 {% block title %}Квиз завершён{% endblock %}
 {% block content %}
-<div class="container my-5 text-center">
-  <h1>Квиз завершён!</h1>
-  <p class="lead">Вы ответили на <strong>{{ correct }}</strong> из <strong>{{ total }}</strong> вопросов.</p>
+<div class="container my-5">
+  <h1 class="text-center mb-4 text-dark">Квиз завершён!</h1>
+  <p class="lead text-center mb-5">Вы ответили на <strong>{{ correct }}</strong> из <strong>{{ total }}</strong> вопросов.</p>
 
-  <form action="{{ url_for('quiz.reset') }}" method="post">
-    <button class="btn button btn-lg">Пройти ещё раз</button>
-  </form>
+  <div class="list-group mb-4" style="background-color: transparent; border: none;">
+    {% for question, answer in questions|zip(answers) %}
+    <div class="list-group-item d-flex justify-content-between align-items-center"
+         style="background-color: transparent; border: none;">
+      <a href="{{ url_for('question_view', id=question.id) }}" 
+         class="text-decoration-none text-dark">
+        {{ question.title }}
+      </a>
+      {% if answer %}
+        <i class="fas fa-check text-success"></i>
+      {% else %}
+        <i class="fas fa-times text-danger"></i>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="text-center mt-4">
+    <form action="{{ url_for('quiz.reset') }}" method="post" class="d-inline">
+      <button class="btn button btn-lg">Пройти ещё раз</button>
+    </form>
+    <a href="{{ url_for('main_page') }}" class="btn button btn-lg ms-2">На главную</a>
+  </div>
 </div>
 {% endblock %}

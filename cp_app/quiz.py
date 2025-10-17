@@ -20,7 +20,6 @@ def quiz_begin():
     """Создаёт список из 10 id-вопросов и кладёт его в session."""
     all_ids = [q.id for q in Question.query.all()]
     if len(all_ids) < 10:
-        # если вопросов мало, берём сколько есть
         session['quiz_ids'] = sample(all_ids, k=len(all_ids))
         session['quiz_total'] = len(all_ids)
     else:
@@ -29,6 +28,8 @@ def quiz_begin():
 
     session['quiz_index'] = 0
     session['quiz_correct'] = 0
+    # Добавляем словарь для хранения ответов
+    session['quiz_answers'] = {}
     return redirect(url_for('quiz.quiz_step', n=0))
 
 
@@ -49,8 +50,13 @@ def quiz_reveal(n):
 
 @quiz_bp.route('/mark/<int:n>', methods=['POST'])
 def quiz_mark(n):
+    q_id = session['quiz_ids'][n]
     if request.form.get('mark') == 'answered':
         session['quiz_correct'] = session.get('quiz_correct', 0) + 1
+        # Сохраняем результат ответа для конкретного вопроса
+        answers = session.get('quiz_answers', {})
+        answers[str(q_id)] = True
+        session['quiz_answers'] = answers
 
     next_n = n + 1
     if next_n >= session['quiz_total']:
@@ -63,7 +69,21 @@ def quiz_mark(n):
 def finish():
     correct = session.get('quiz_correct', 0)
     total = session.get('quiz_total', 10)
-    return render_template('quiz_finish.html', correct=correct, total=total)
+    quiz_ids = session.get('quiz_ids', [])
+    questions = Question.query.filter(Question.id.in_(quiz_ids)).all()
+    questions = sorted(questions, key=lambda q: quiz_ids.index(q.id))
+
+    # Получаем ответы для каждого вопроса
+    answers_dict = session.get('quiz_answers', {})
+    answers = [answers_dict.get(str(q.id), False) for q in questions]
+
+    return render_template(
+        'quiz_finish.html',
+        correct=correct,
+        total=total,
+        questions=questions,
+        answers=answers
+    )
 
 
 @quiz_bp.route('/reset', methods=['POST'])
@@ -72,4 +92,5 @@ def reset():
     session.pop('quiz_index', None)
     session.pop('quiz_correct', None)
     session.pop('quiz_total', None)
+    session.pop('quiz_answers', None)
     return redirect(url_for('quiz.quiz_start'))
