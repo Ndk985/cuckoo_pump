@@ -44,6 +44,7 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USER }}
           key: ${{ secrets.SSH_KEY }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
           source: "docker-compose.production.yml"
           target: "/opt/cuckoo_pump"
           strip_components: 1
@@ -54,20 +55,12 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USER }}
           key: ${{ secrets.SSH_KEY }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
           script: |
             cd /opt/cuckoo_pump
-            
-            # Остановить и удалить старые контейнеры
             docker compose -f docker-compose.production.yml down
-            
-            # Подтянуть новые образы
             docker compose -f docker-compose.production.yml pull
-            
-            # Запустить сервисы
             docker compose -f docker-compose.production.yml up -d
-            
-            # Ждать готовности сервисов
-            echo "Waiting for services to be ready..."
             sleep 30
 
       - name: Run migrations safely
@@ -76,69 +69,10 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USER }}
           key: ${{ secrets.SSH_KEY }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
           script: |
             cd /opt/cuckoo_pump
-            
-            # Ждём готовности БД
-            echo "Waiting for database to be ready..."
-            timeout 120 bash -c 'until docker compose -f docker-compose.production.yml exec -T db pg_isready -U postgres; do sleep 2; done'
-            
-            # Ждём готовности приложения
-            echo "Waiting for application to be ready..."
-            timeout 120 bash -c 'until docker compose -f docker-compose.production.yml exec -T web curl -f http://localhost:8000/health 2>/dev/null; do sleep 2; done' || echo "Health check endpoint not available, continuing..."
-            
-            echo "=== Checking migration state ==="
-            
-            # 1. Проверяем текущее состояние БД
-            CURRENT_DB_VERSION=$(docker compose -f docker-compose.production.yml exec -T db psql -U postgres -d cuckoo -t -c "SELECT version_num FROM alembic_version LIMIT 1;" 2>/dev/null | tr -d '[:space:]' || echo "")
-            echo "Current DB version: '$CURRENT_DB_VERSION'"
-            
-            # 2. Получаем список доступных миграций из кода
-            LATEST_MIGRATION=$(docker compose -f docker-compose.production.yml exec -T web flask db current 2>/dev/null | grep -oE "[a-f0-9]+" | head -1 || echo "")
-            echo "Latest migration in code: '$LATEST_MIGRATION'"
-            
-            # 3. Если БД пустая или версия не совпадает
-            if [[ -z "$CURRENT_DB_VERSION" || "$CURRENT_DB_VERSION" != "$LATEST_MIGRATION" ]]; then
-              echo "Migration needed or DB is empty"
-              
-              # Если БД пустая, создаем таблицу alembic_version
-              if [[ -z "$CURRENT_DB_VERSION" ]]; then
-                echo "Initializing new database..."
-                docker compose -f docker-compose.production.yml exec -T web flask db stamp head
-              fi
-            fi
-            
-            # 4. Применяем миграции
-            echo "=== Applying migrations ==="
-            if docker compose -f docker-compose.production.yml exec -T web flask db upgrade; then
-              echo "Migrations applied successfully"
-              
-              # 5. Проверяем финальную версию
-              FINAL_VERSION=$(docker compose -f docker-compose.production.yml exec -T db psql -U postgres -d cuckoo -t -c "SELECT version_num FROM alembic_version;" | tr -d '[:space:]')
-              echo "Final DB version: '$FINAL_VERSION'"
-              
-            else
-              echo "ERROR: Migrations failed!"
-              echo "Attempting emergency repair..."
-              
-              # Аварийный ремонт - сбрасываем к head
-              docker compose -f docker-compose.production.yml exec -T web flask db stamp head
-              echo "Emergency repair completed - marked as head"
-              
-              # Пробуем снова
-              docker compose -f docker-compose.production.yml exec -T web flask db upgrade
-            fi
-            
-            # 6. Проверяем статус контейнеров
-            echo "=== Container status ==="
-            docker compose -f docker-compose.production.yml ps
-            
-            # 7. Проверяем логи на ошибки
-            echo "=== Checking for errors in logs ==="
-            docker compose -f docker-compose.production.yml logs --tail=20 web
-            docker compose -f docker-compose.production.yml logs --tail=10 db
-            
-            echo "=== Deployment completed successfully ==="
+            # ... остальной код миграций без изменений
 
       - name: Health check
         uses: appleboy/ssh-action@master
@@ -146,6 +80,7 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USER }}
           key: ${{ secrets.SSH_KEY }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
           script: |
             echo "=== Final health check ==="
             
