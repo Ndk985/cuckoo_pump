@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 db_backup.py
 Автоматизированный дамп БД + скачивание.
@@ -39,17 +38,19 @@ def read_env(path: Path):
 HERE = Path(__file__).resolve().parent
 ENV = read_env(HERE / ".env")
 
-SSH_HOST = ENV.get("SSH_HOST", "84.252.136.106")
-SSH_USER = ENV.get("SSH_USER", "yc-user")
-SSH_KEY_PATH = ENV.get("SSH_KEY_PATH", "D:/Dev/vm_access/yc-ndk985")
+# ИЗМЕНЕНИЯ: новый сервер и путь
+SSH_HOST = ENV.get("SSH_HOST", "109.73.206.39")
+SSH_USER = ENV.get("SSH_USER", "root")
+SSH_KEY_PATH = ENV.get("SSH_KEY_PATH", "D:/Dev/vm_access/id_ed25519")
 SSH_KEY_PASSWORD = ENV.get("SSH_KEY_PASSWORD", None)
 SSH_PASSWORD = ENV.get("SSH_PASSWORD", None)
-REMOTE_PROJECT_DIR = ENV.get("REMOTE_PROJECT_DIR", "/home/yc-user/cuckoo_pump")
+REMOTE_PROJECT_DIR = ENV.get("REMOTE_PROJECT_DIR", "/opt/cuckoo_pump")
 CONTAINER_NAME = ENV.get("CONTAINER_NAME", "cuckoo_pump_db")
 DB_USER = ENV.get("DB_USER", "postgres")
 DB_NAME = ENV.get("DB_NAME", "cuckoo")
-LOCAL_BACKUP_DIR = ENV.get("LOCAL_BACKUP_DIR",
-                            str(Path("D:/DB_backup/cuckoo_pump")))
+LOCAL_BACKUP_DIR = ENV.get(
+    "LOCAL_BACKUP_DIR", str(Path("D:/DB_backup/cuckoo_pump"))
+)
 DATE_IN_NAME = ENV.get("DATE_IN_NAME", "true").lower() in \
                ("1", "true", "yes", "on")
 REMOVE_REMOTE_AFTER_DOWNLOAD = ENV.get("REMOVE_REMOTE_AFTER_DOWNLOAD",
