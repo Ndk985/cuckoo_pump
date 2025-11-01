@@ -1,0 +1,577 @@
+/* ====== Темная тема для Flask-Admin ====== */
+
+/* Переменные для светлой темы (по умолчанию) */
+:root,
+[data-theme="light"] {
+  --admin-bg-primary: #ffffff;
+  --admin-bg-secondary: #f8f9fa;
+  --admin-bg-tertiary: #e9ecef;
+  --admin-text-primary: #212529;
+  --admin-text-secondary: #6c757d;
+  --admin-border-color: #dee2e6;
+  --admin-link-color: #007bff;
+  --admin-link-hover: #0056b3;
+  --admin-navbar-bg: #343a40;
+  --admin-navbar-text: #ffffff;
+  --admin-navbar-hover: #495057;
+  --admin-sidebar-bg: #f8f9fa;
+  --admin-sidebar-hover: #e9ecef;
+  --admin-table-stripe: #f8f9fa;
+  --admin-input-bg: #ffffff;
+  --admin-input-border: #ced4da;
+  --admin-input-focus: #80bdff;
+}
+
+/* Переменные для темной темы */
+[data-theme="dark"] {
+  --admin-bg-primary: #1a1a1a;
+  --admin-bg-secondary: #2d2d2d;
+  --admin-bg-tertiary: #3a3a3a;
+  --admin-text-primary: #e0e0e0;
+  --admin-text-secondary: #a0a0a0;
+  --admin-border-color: #404040;
+  --admin-link-color: #66b3ff;
+  --admin-link-hover: #4da6ff;
+  --admin-navbar-bg: #0d0d0d;
+  --admin-navbar-text: #ffffff;
+  --admin-navbar-hover: #2d2d2d;
+  --admin-sidebar-bg: #252525;
+  --admin-sidebar-hover: #353535;
+  --admin-table-stripe: #2d2d2d;
+  --admin-input-bg: #2d2d2d;
+  --admin-input-border: #404040;
+  --admin-input-focus: #66b3ff;
+}
+
+/* Основные стили для админки */
+.admin-wrapper {
+  background-color: var(--admin-bg-primary);
+  color: var(--admin-text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Навбар */
+.navbar {
+  background-color: var(--admin-navbar-bg) !important;
+  border-bottom: 1px solid var(--admin-border-color);
+}
+
+.navbar-brand,
+.navbar-nav .nav-link {
+  color: var(--admin-navbar-text) !important;
+}
+
+.navbar-nav .nav-link:hover {
+  color: var(--admin-navbar-text) !important;
+  background-color: var(--admin-navbar-hover);
+}
+
+/* Боковая панель (sidebar) */
+.list-group-item {
+  background-color: var(--admin-sidebar-bg);
+  border-color: var(--admin-border-color);
+  color: var(--admin-text-primary);
+}
+
+.list-group-item:hover {
+  background-color: var(--admin-sidebar-hover);
+  color: var(--admin-text-primary);
+}
+
+.list-group-item.active {
+  background-color: var(--admin-link-color);
+  border-color: var(--admin-link-color);
+}
+
+/* Основной контент */
+body {
+  background-color: var(--admin-bg-primary);
+  color: var(--admin-text-primary);
+}
+
+.container-fluid {
+  background-color: var(--admin-bg-primary);
+}
+
+/* Карточки и панели */
+.card,
+.panel,
+.well {
+  background-color: var(--admin-bg-secondary);
+  border-color: var(--admin-border-color);
+  color: var(--admin-text-primary);
+}
+
+.card-header {
+  background-color: var(--admin-bg-tertiary);
+  border-bottom-color: var(--admin-border-color);
+  color: var(--admin-text-primary);
+}
+
+/* Таблицы */
+.table {
+  color: var(--admin-text-primary);
+}
+
+.table-striped > tbody > tr:nth-of-type(odd) {
+  background-color: var(--admin-table-stripe);
+}
+
+.table-hover > tbody > tr:hover {
+  background-color: var(--admin-bg-tertiary);
+}
+
+.table-bordered {
+  border-color: var(--admin-border-color);
+}
+
+.table-bordered td,
+.table-bordered th {
+  border-color: var(--admin-border-color);
+}
+
+/* Формы */
+.form-control {
+  background-color: var(--admin-input-bg);
+  border-color: var(--admin-input-border);
+  color: var(--admin-text-primary);
+}
+
+.form-control:focus {
+  background-color: var(--admin-input-bg);
+  border-color: var(--admin-input-focus);
+  color: var(--admin-text-primary);
+  box-shadow: 0 0 0 0.2rem rgba(102, 179, 255, 0.25);
+}
+
+.form-control::placeholder {
+  color: var(--admin-text-secondary);
+  opacity: 1;
+}
+
+.form-select {
+  background-color: var(--admin-input-bg);
+  border-color: var(--admin-input-border);
+  color: var(--admin-text-primary);
+}
+
+.form-select:focus {
+  background-color: var(--admin-input-bg);
+  border-color: var(--admin-input-focus);
+  color: var(--admin-text-primary);
+}
+
+/* Кнопки */
+.btn-primary {
+  background-color: var(--admin-link-color);
+  border-color: var(--admin-link-color);
+  color: #ffffff;
+}
+
+.btn-primary:hover {
+  background-color: var(--admin-link-hover);
+  border-color: var(--admin-link-hover);
+  color: #ffffff;
+}
+
+.btn-secondary {
+  background-color: var(--admin-bg-tertiary);
+  border-color: var(--admin-border-color);
+  color: var(--admin-text-primary);
+}
+
+.btn-secondary:hover {
+  background-color: var(--admin-border-color);
+  border-color: var(--admin-border-color);
+  color: var(--admin-text-primary);
+}
+
+.btn-outline-light {
+  border-color: rgba(255, 255, 255, 0.5);
+  color: var(--admin-navbar-text);
+  background-color: transparent;
+}
+
+.btn-outline-light:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.75);
+  color: var(--admin-navbar-text);
+}
+
+.btn-outline-light:focus,
+.btn-outline-light.focus {
+  box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.5);
+}
+
+/* Дополнительные кнопки Bootstrap */
+.btn-success {
+  background-color: #28a745;
+  border-color: #28a745;
+}
+
+.btn-danger {
+  background-color: #dc3545;
+  border-color: #dc3545;
+}
+
+.btn-warning {
+  background-color: #ffc107;
+  border-color: #ffc107;
+  color: #212529;
+}
+
+.btn-info {
+  background-color: #17a2b8;
+  border-color: #17a2b8;
+}
+
+/* Ссылки */
+a {
+  color: var(--admin-link-color);
+}
+
+a:hover {
+  color: var(--admin-link-hover);
+}
+
+/* Пагинация */
+.pagination .page-link {
+  background-color: var(--admin-input-bg);
+  border-color: var(--admin-border-color);
+  color: var(--admin-link-color);
+}
+
+.pagination .page-link:hover {
+  background-color: var(--admin-bg-tertiary);
+  border-color: var(--admin-border-color);
+  color: var(--admin-link-hover);
+}
+
+.pagination .page-item.active .page-link {
+  background-color: var(--admin-link-color);
+  border-color: var(--admin-link-color);
+}
+
+/* Алерты */
+.alert {
+  border-color: var(--admin-border-color);
+}
+
+.alert-info {
+  background-color: var(--admin-bg-secondary);
+  border-color: var(--admin-link-color);
+  color: var(--admin-text-primary);
+}
+
+.alert-success {
+  background-color: var(--admin-bg-secondary);
+  border-color: #28a745;
+  color: var(--admin-text-primary);
+}
+
+.alert-warning {
+  background-color: var(--admin-bg-secondary);
+  border-color: #ffc107;
+  color: var(--admin-text-primary);
+}
+
+.alert-danger {
+  background-color: var(--admin-bg-secondary);
+  border-color: #dc3545;
+  color: var(--admin-text-primary);
+}
+
+/* Модальные окна */
+.modal-content {
+  background-color: var(--admin-bg-secondary);
+  border-color: var(--admin-border-color);
+  color: var(--admin-text-primary);
+}
+
+.modal-header {
+  border-bottom-color: var(--admin-border-color);
+}
+
+.modal-footer {
+  border-top-color: var(--admin-border-color);
+}
+
+.modal-body {
+  color: var(--admin-text-primary);
+}
+
+/* Badge */
+.badge {
+  background-color: var(--admin-bg-tertiary);
+  color: var(--admin-text-primary);
+}
+
+.badge-primary {
+  background-color: var(--admin-link-color);
+  color: #ffffff;
+}
+
+/* Dropdown меню */
+.dropdown-menu {
+  background-color: var(--admin-bg-secondary);
+  border-color: var(--admin-border-color);
+}
+
+.dropdown-item {
+  color: var(--admin-text-primary);
+}
+
+.dropdown-item:hover {
+  background-color: var(--admin-bg-tertiary);
+  color: var(--admin-text-primary);
+}
+
+.dropdown-item.active {
+  background-color: var(--admin-link-color);
+}
+
+/* Breadcrumb */
+.breadcrumb {
+  background-color: var(--admin-bg-secondary);
+}
+
+.breadcrumb-item.active {
+  color: var(--admin-text-secondary);
+}
+
+/* Поиск и фильтры */
+.form-control:disabled,
+.form-control[readonly] {
+  background-color: var(--admin-bg-tertiary);
+  opacity: 0.6;
+}
+
+/* Подсветка выбранных элементов */
+.table tbody tr.selected {
+  background-color: var(--admin-link-color) !important;
+  color: #ffffff;
+}
+
+/* Исправление для CKEditor в темной теме */
+.cke_chrome {
+  border-color: var(--admin-border-color) !important;
+}
+
+.cke_top,
+.cke_bottom {
+  background-color: var(--admin-bg-tertiary) !important;
+  border-color: var(--admin-border-color) !important;
+}
+
+.cke_contents {
+  background-color: var(--admin-input-bg) !important;
+}
+
+/* Чекбоксы и радиокнопки */
+.form-check-input {
+  background-color: var(--admin-input-bg);
+  border-color: var(--admin-input-border);
+}
+
+.form-check-input:checked {
+  background-color: var(--admin-link-color);
+  border-color: var(--admin-link-color);
+}
+
+/* Инпуты с типами */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="date"],
+input[type="datetime-local"],
+textarea {
+  background-color: var(--admin-input-bg);
+  border-color: var(--admin-input-border);
+  color: var(--admin-text-primary);
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="number"]:focus,
+input[type="date"]:focus,
+input[type="datetime-local"]:focus,
+textarea:focus {
+  background-color: var(--admin-input-bg);
+  border-color: var(--admin-input-focus);
+  color: var(--admin-text-primary);
+}
+
+/* Hr разделители */
+hr {
+  border-color: var(--admin-border-color);
+}
+
+/* Дополнительные элементы Bootstrap 4 для админки */
+.nav-tabs {
+  border-bottom-color: var(--admin-border-color);
+}
+
+.nav-tabs .nav-link {
+  color: var(--admin-text-primary);
+  border-color: var(--admin-border-color);
+}
+
+.nav-tabs .nav-link:hover {
+  border-color: var(--admin-border-color) var(--admin-border-color) var(--admin-bg-tertiary);
+  background-color: var(--admin-bg-tertiary);
+}
+
+.nav-tabs .nav-link.active {
+  color: var(--admin-text-primary);
+  background-color: var(--admin-bg-primary);
+  border-color: var(--admin-border-color) var(--admin-border-color) var(--admin-bg-primary);
+}
+
+/* Выпадающие списки (select) */
+select.form-control {
+  background-color: var(--admin-input-bg);
+  border-color: var(--admin-input-border);
+  color: var(--admin-text-primary);
+}
+
+select.form-control:focus {
+  background-color: var(--admin-input-bg);
+  border-color: var(--admin-input-focus);
+  color: var(--admin-text-primary);
+}
+
+/* Лейблы форм */
+label,
+.form-label {
+  color: var(--admin-text-primary);
+}
+
+/* Текст помощи в формах */
+.form-text,
+.help-block {
+  color: var(--admin-text-secondary);
+}
+
+/* Таблица действий в админке */
+.action-column {
+  color: var(--admin-text-primary);
+}
+
+/* Иконки и svg */
+svg {
+  fill: var(--admin-text-primary);
+}
+
+/* Блоки кода */
+code,
+pre {
+  background-color: var(--admin-bg-tertiary);
+  color: var(--admin-text-primary);
+  border-color: var(--admin-border-color);
+}
+
+/* Progress bars */
+.progress {
+  background-color: var(--admin-bg-tertiary);
+}
+
+.progress-bar {
+  background-color: var(--admin-link-color);
+}
+
+/* Tooltips */
+.tooltip-inner {
+  background-color: var(--admin-bg-secondary);
+  color: var(--admin-text-primary);
+}
+
+.bs-tooltip-top .arrow::before,
+.bs-tooltip-auto[data-popper-placement^="top"] .arrow::before {
+  border-top-color: var(--admin-bg-secondary);
+}
+
+/* Popovers */
+.popover {
+  background-color: var(--admin-bg-secondary);
+  border-color: var(--admin-border-color);
+  color: var(--admin-text-primary);
+}
+
+.popover-header {
+  background-color: var(--admin-bg-tertiary);
+  border-bottom-color: var(--admin-border-color);
+  color: var(--admin-text-primary);
+}
+
+.popover-body {
+  color: var(--admin-text-primary);
+}
+
+/* Панели (Bootstrap 4) */
+.panel {
+  background-color: var(--admin-bg-secondary);
+  border-color: var(--admin-border-color);
+}
+
+.panel-heading {
+  background-color: var(--admin-bg-tertiary);
+  border-color: var(--admin-border-color);
+  color: var(--admin-text-primary);
+}
+
+.panel-body {
+  color: var(--admin-text-primary);
+}
+
+.panel-footer {
+  background-color: var(--admin-bg-tertiary);
+  border-top-color: var(--admin-border-color);
+  color: var(--admin-text-primary);
+}
+
+/* Well (Bootstrap 4) */
+.well {
+  background-color: var(--admin-bg-secondary);
+  border-color: var(--admin-border-color);
+  color: var(--admin-text-primary);
+}
+
+/* Аккордеон */
+.card-header .btn-link {
+  color: var(--admin-link-color);
+}
+
+.card-header .btn-link:hover {
+  color: var(--admin-link-hover);
+}
+
+.card-header .btn-link:focus {
+  color: var(--admin-link-hover);
+}
+
+/* List groups */
+.list-group-item-action {
+  color: var(--admin-text-primary);
+}
+
+.list-group-item-action:hover,
+.list-group-item-action:focus {
+  background-color: var(--admin-bg-tertiary);
+  color: var(--admin-text-primary);
+}
+
+.list-group-item-action.active {
+  background-color: var(--admin-link-color);
+  border-color: var(--admin-link-color);
+  color: #ffffff;
+}
+
+/* Input groups */
+.input-group-text {
+  background-color: var(--admin-bg-tertiary);
+  border-color: var(--admin-input-border);
+  color: var(--admin-text-primary);
+}
+
