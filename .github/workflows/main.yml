@@ -70,10 +70,9 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
           source: "docker-compose.production.yml"
-          target: "/opt/cuckoo_pump"
-          strip_components: 1
+          target: "/opt/cuckoo_pump/docker-compose.production.yml"
 
-      - name: Deploy on server
+      - name: Verify and deploy on server
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.HOST }}
@@ -82,10 +81,55 @@ jobs:
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
           script: |
             cd /opt/cuckoo_pump
+            
+            # Проверяем что файл скопировался правильно
+            echo "=== Verifying docker-compose.production.yml ==="
+            if [ ! -f docker-compose.production.yml ]; then
+              echo "ERROR: docker-compose.production.yml not found!"
+              exit 1
+            fi
+            echo "File content:"
+            cat docker-compose.production.yml
+            echo ""
+            echo "Checking for :latest tags:"
+            if ! grep -E "image:.*:latest" docker-compose.production.yml; then
+              echo "ERROR: docker-compose.production.yml doesn't contain :latest tags!"
+              exit 1
+            fi
+            echo "File verification passed - all images use :latest"
+            
+            # Загружаем новые образы
+            echo "=== Pulling latest images ==="
             sudo docker compose -f docker-compose.production.yml pull
+            
+            # Останавливаем и удаляем старые контейнеры
+            echo "=== Stopping old containers ==="
             sudo docker compose -f docker-compose.production.yml down
-            sudo docker compose -f docker-compose.production.yml up -d
+            
+            # Удаляем старые образы с тегом :231025 если они есть (опционально, чтобы освободить место)
+            echo "=== Cleaning up old images ==="
+            sudo docker images | grep "231025" | awk '{print $3}' | xargs -r sudo docker rmi -f || true
+            
+            # Запускаем новые контейнеры с принудительной пересозданием
+            echo "=== Starting new containers ==="
+            sudo docker compose -f docker-compose.production.yml up -d --force-recreate --remove-orphans
+            
+            echo "=== Waiting for services to start ==="
             sleep 20
+            
+            # Проверяем что контейнеры запущены с правильными образами
+            echo "=== Verifying container images ==="
+            sudo docker ps --format "table {{.Names}}\t{{.Image}}\t{{.Status}}" | grep cuckoo_pump
+            echo ""
+            echo "Verifying all containers use :latest images:"
+            WRONG_IMAGES=$(sudo docker ps --format "{{.Names}}\t{{.Image}}" | grep cuckoo_pump | grep -v ":latest" || true)
+            if [ -n "$WRONG_IMAGES" ]; then
+              echo "WARNING: Some containers are not using :latest images:"
+              echo "$WRONG_IMAGES"
+              exit 1
+            else
+              echo "✓ All containers are using :latest images"
+            fi
 
       - name: Run migrations safely
         uses: appleboy/ssh-action@master
