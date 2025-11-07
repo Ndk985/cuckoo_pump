@@ -1,10 +1,10 @@
 name: Cuckoo Pump Workflow
 
 on:
-  # push:
-  #   branches:
-  #     - main
-  # workflow_dispatch:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
 
 jobs:
   build_web_and_push:
@@ -70,7 +70,8 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
           source: "docker-compose.production.yml"
-          target: "/opt/cuckoo_pump/docker-compose.production.yml"
+          target: "/opt/cuckoo_pump"
+          strip_components: 0
 
       - name: Verify and deploy on server
         uses: appleboy/ssh-action@master

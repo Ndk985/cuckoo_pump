@@ -28,7 +28,7 @@ services:
     container_name: cuckoo_pump_gateway
     restart: always
     ports:
-      - "8000:80"   # наружный порт сервера
+      - "8000:80"   # наружу отдаём только nginx
     depends_on:
       - web
   bot:

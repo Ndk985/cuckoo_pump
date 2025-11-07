@@ -1,11 +1,11 @@
 name: Test File Copy
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'test.py'
+#   push:
+#     branches:
+#       - main
+#     paths:
+#       - 'test.py'
   workflow_dispatch:
 
 jobs:
