@@ -1,0 +1,50 @@
+name: Test File Copy
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'test.py'
+  workflow_dispatch:
+
+jobs:
+  test_copy_file:
+    name: Test copy test.py to server
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Copy test.py to server
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USER }}
+          key: ${{ secrets.SSH_KEY }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
+          source: "test.py"
+          target: "/opt/cuckoo_pump/test.py"
+
+      - name: Verify file was copied
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USER }}
+          key: ${{ secrets.SSH_KEY }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
+          script: |
+            echo "=== Checking if test.py exists ==="
+            if [ -f /opt/cuckoo_pump/test.py ]; then
+              echo "✓ File test.py exists!"
+              echo "File size:"
+              ls -lh /opt/cuckoo_pump/test.py
+              echo "File content:"
+              cat /opt/cuckoo_pump/test.py
+            else
+              echo "✗ File test.py NOT found!"
+              exit 1
+            fi
+            echo "=== Listing directory contents ==="
+            ls -la /opt/cuckoo_pump/
+
