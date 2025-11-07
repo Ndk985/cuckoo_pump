@@ -16,6 +16,24 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
+      - name: Clean up old test.py directory if exists
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USER }}
+          key: ${{ secrets.SSH_KEY }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
+          script: |
+            echo "=== Cleaning up old test.py if exists ==="
+            if [ -d /opt/cuckoo_pump/test.py ]; then
+              echo "Removing old test.py directory..."
+              rm -rf /opt/cuckoo_pump/test.py
+            fi
+            if [ -f /opt/cuckoo_pump/test.py ]; then
+              echo "Removing old test.py file..."
+              rm -f /opt/cuckoo_pump/test.py
+            fi
+
       - name: Copy test.py to server
         uses: appleboy/scp-action@master
         with:
@@ -24,7 +42,8 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
           source: "test.py"
-          target: "/opt/cuckoo_pump/test.py"
+          target: "/opt/cuckoo_pump"
+          strip_components: 0
 
       - name: Verify file was copied
         uses: appleboy/ssh-action@master
@@ -43,6 +62,8 @@ jobs:
               cat /opt/cuckoo_pump/test.py
             else
               echo "✗ File test.py NOT found!"
+              echo "Checking what exists:"
+              ls -la /opt/cuckoo_pump/ | grep test
               exit 1
             fi
             echo "=== Listing directory contents ==="
