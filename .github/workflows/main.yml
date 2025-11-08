@@ -122,14 +122,15 @@ jobs:
             echo "=== Verifying container images ==="
             sudo docker ps --format "table {{.Names}}\t{{.Image}}\t{{.Status}}" | grep cuckoo_pump
             echo ""
-            echo "Verifying all containers use :latest images:"
-            WRONG_IMAGES=$(sudo docker ps --format "{{.Names}}\t{{.Image}}" | grep cuckoo_pump | grep -v ":latest" || true)
+            echo "Verifying project containers use :latest images:"
+            # Проверяем только контейнеры проекта (исключаем postgres и другие внешние образы)
+            WRONG_IMAGES=$(sudo docker ps --format "{{.Names}}\t{{.Image}}" | grep cuckoo_pump | grep -v "postgres:" | grep -v ":latest" || true)
             if [ -n "$WRONG_IMAGES" ]; then
-              echo "WARNING: Some containers are not using :latest images:"
+              echo "WARNING: Some project containers are not using :latest images:"
               echo "$WRONG_IMAGES"
               exit 1
             else
-              echo "✓ All containers are using :latest images"
+              echo "✓ All project containers are using :latest images"
             fi
 
       - name: Run migrations safely
