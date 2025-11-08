@@ -16,8 +16,8 @@ services:
     restart: always
     env_file:
       - .env
-    expose:
-      - "8000"
+    ports:
+      - "127.0.0.1:8000:8000"  # Публикуем на localhost для доступа бота (network_mode: host)
     depends_on:
       - db
     volumes:
@@ -28,7 +28,7 @@ services:
     container_name: cuckoo_pump_gateway
     restart: always
     ports:
-      - "8000:80"   # наружу отдаём только nginx
+      - "8080:80"   # наружу отдаём только nginx
     depends_on:
       - web
   bot:
@@ -38,8 +38,11 @@ services:
     env_file:
       - .env
     command: python tg_bot.py
-    depends_on:
-      - web
+    # Используем сеть хоста для обхода SSL-инспекции Docker сети
+    network_mode: host
+    # Бот подключается к web через localhost:8000
+    environment:
+      - FLASK_HOST=http://localhost:8000
 
 volumes:
   pg_data:
