@@ -25,7 +25,10 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}" />
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
     <style>
-      main { flex: 1 0 auto; }
+      main { 
+        flex: 1 0 auto; 
+        padding-bottom: 80px; /* Отступ снизу для фиксированного футера */
+      }
       /* Плавные переходы только для интерактивных изменений */
       body {
         transition: background-color 0.3s ease, color 0.3s ease;

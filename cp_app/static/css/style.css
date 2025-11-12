@@ -217,3 +217,36 @@ textarea.form-control.comment-input {
   background-color: transparent !important;
   color: var(--bs-body-color) !important;
 }
+
+/* ====== Sticky Footer ====== */
+.footer-sticky {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background-color: var(--bg-primary);
+  border-top: 1px solid var(--border-color);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Текст футера использует цвет ссылки для лучшей видимости */
+.footer-text {
+  color: var(--link-color) !important;
+}
+
+.footer-link {
+  color: var(--link-color) !important;
+  transition: color 0.3s ease;
+}
+
+.footer-link:hover {
+  color: #e7390d !important;
+}
+
+/* Адаптивность для мобильных устройств */
+@media (max-width: 600px) {
+  main {
+    padding-bottom: 100px; /* Больше отступ на мобильных, если футер выше */
+  }
+}
