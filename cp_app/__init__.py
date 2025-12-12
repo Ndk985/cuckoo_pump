@@ -133,7 +133,7 @@ class AdminModelView(ModelView):
 admin = Admin(app, name='Quiz Admin', template_mode='bootstrap4')
 
 # Импортируем модели и регистрируем их
-from cp_app.models import User, Question, Comment
+from cp_app.models import User, Question, Comment, Tag
 
 
 # Кастомный ModelView для пользователей
@@ -156,3 +156,4 @@ class UserAdminView(AdminModelView):
 admin.add_view(UserAdminView(User, db.session))
 admin.add_view(AdminModelView(Question, db.session))
 admin.add_view(AdminModelView(Comment, db.session))
+admin.add_view(AdminModelView(Tag, db.session))

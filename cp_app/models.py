@@ -5,23 +5,45 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 from . import db
 
+# Связующая таблица "многие-ко-многим" между вопросами и тегами
+question_tags = db.Table(
+    'question_tags',
+    db.Column('question_id', db.Integer, db.ForeignKey('question.id'), primary_key=True),
+    db.Column('tag_id', db.Integer, db.ForeignKey('tag.id'), primary_key=True),
+)
+
 
 class Question(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(128), nullable=False, unique=True)
     text = db.Column(db.Text, unique=True, nullable=False)
+    tags = db.relationship(
+        'Tag',
+        secondary=question_tags,
+        backref=db.backref('questions', lazy='select'),
+        lazy='select'
+    )
 
     def to_dict(self):
         return dict(
             id=self.id,
             title=self.title,
             text=self.text,
+            tags=[tag.name for tag in self.tags],
         )
 
     def from_dict(self, data):
         for field in ['title', 'text']:
             if field in data:
                 setattr(self, field, data[field])
+
+
+class Tag(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), unique=True, nullable=False, index=True)
+
+    def __repr__(self):
+        return f'<Tag {self.name}>'
 
 
 class User(UserMixin, db.Model):

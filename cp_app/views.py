@@ -7,8 +7,33 @@ from sqlalchemy import or_
 
 from . import app, db
 from .forms import LoginForm, QuestionForm, RegistrationForm, CommentForm
-from .models import Question, User, Comment
+from .models import Question, User, Comment, Tag
 from .quiz import *   # noqa
+
+
+def _parse_tags(raw: str):
+    """Разбирает строку тегов в список уникальных имён (в нижнем регистре)."""
+    if not raw:
+        return []
+    parts = [p.strip().lower() for p in raw.split(',')]
+    # удаляем пустые и дубликаты, сохраняя порядок
+    seen = set()
+    tags = []
+    for name in parts:
+        if name and name not in seen:
+            seen.add(name)
+            tags.append(name)
+    return tags
+
+
+def _sync_question_tags(question, tag_names):
+    """Обновляет теги вопроса, создавая недостающие теги."""
+    question.tags = []  # очищаем текущие связи
+    for name in tag_names:
+        tag = Tag.query.filter_by(name=name).first()
+        if not tag:
+            tag = Tag(name=name)
+        question.tags.append(tag)
 
 
 def admin_required(f):
@@ -46,6 +71,8 @@ def add_question_view():
             title=title,
             text=form.text.data,
         )
+        tags = _parse_tags(form.tags.data)
+        _sync_question_tags(question, tags)
         db.session.add(question)
         db.session.commit()
         return redirect(url_for('question_view', id=question.id))
@@ -86,8 +113,14 @@ def edit_question_view(id):
     question = Question.query.get_or_404(id)
 
     form = QuestionForm(obj=question)
+    if request.method == 'GET':
+        form.tags.data = ', '.join(sorted([tag.name for tag in question.tags]))
+
     if form.validate_on_submit():
-        form.populate_obj(question)
+        question.title = form.title.data
+        question.text = form.text.data
+        tags = _parse_tags(form.tags.data)
+        _sync_question_tags(question, tags)
         db.session.commit()
         flash('Вопрос обновлён')
         return redirect(url_for('question_view', id=question.id))
@@ -172,6 +205,7 @@ def all_questions():
     page = request.args.get('page', 1, type=int)
     per_page = 20
     search = request.args.get('search', '', type=str).strip()
+    tag_filter = request.args.get('tag', '', type=str).strip()
 
     query = Question.query
     if search:
@@ -181,13 +215,19 @@ def all_questions():
         )
         query = query.filter(search_filter)
 
+    if tag_filter:
+        query = query.join(Question.tags).filter(Tag.name == tag_filter)
+
     pagination = query.order_by(
         Question.id).paginate(page=page, per_page=per_page)
+    all_tags = Tag.query.order_by(Tag.name).all()
     return render_template(
         'questions_list.html',
         questions=pagination.items,
         pagination=pagination,
-        search=search
+        search=search,
+        tags=all_tags,
+        active_tag=tag_filter
     )
 
 

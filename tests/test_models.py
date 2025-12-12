@@ -3,7 +3,7 @@
 """
 import pytest
 from cp_app import db
-from cp_app.models import User, Question, Comment
+from cp_app.models import User, Question, Comment, Tag
 from datetime import datetime
 
 
@@ -114,6 +114,8 @@ class TestQuestion:
                 title='Test Question?',
                 text='Test Answer'
             )
+            tag = Tag(name='python')
+            question.tags.append(tag)
             db.session.add(question)
             db.session.commit()
 
@@ -121,6 +123,7 @@ class TestQuestion:
             assert data['id'] == question.id
             assert data['title'] == 'Test Question?'
             assert data['text'] == 'Test Answer'
+            assert data['tags'] == ['python']
 
     def test_question_from_dict(self, client):
         """Тест метода from_dict"""
@@ -136,6 +139,21 @@ class TestQuestion:
 
             assert question.title == 'New Title?'
             assert question.text == 'New Answer'
+
+    def test_question_tags_relationship(self, client):
+        """Тест связи вопроса с тегами"""
+        with client.application.app_context():
+            question = Question(title='Tagged?', text='Answer with tags')
+            python_tag = Tag(name='python')
+            flask_tag = Tag(name='flask')
+            question.tags.extend([python_tag, flask_tag])
+
+            db.session.add(question)
+            db.session.commit()
+
+            stored = Question.query.get(question.id)
+            tag_names = sorted([t.name for t in stored.tags])
+            assert tag_names == ['flask', 'python']
 
 
 class TestComment:

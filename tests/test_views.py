@@ -3,7 +3,7 @@
 """
 import pytest
 from cp_app import db
-from cp_app.models import User, Question, Comment
+from cp_app.models import User, Question, Comment, Tag
 
 
 class TestAuthentication:
@@ -114,6 +114,23 @@ class TestQuestionViews:
         response = client.get('/questions?search=Question 1')
         assert response.status_code == 200
 
+    def test_all_questions_filter_by_tag(self, client):
+        """Тест фильтрации вопросов по тегу"""
+        with client.application.app_context():
+            tag_python = Tag(name='python')
+            q1 = Question(title='Python basics?', text='about python')
+            q2 = Question(title='Flask intro?', text='about flask')
+            q1.tags.append(tag_python)
+            db.session.add_all([q1, q2])
+            db.session.commit()
+
+        response = client.get('/questions?tag=python')
+        assert response.status_code == 200
+        body = response.data.decode('utf-8', errors='ignore').lower()
+        assert 'python basics?' in body
+        assert 'flask intro?' not in body
+        assert 'python' in body  # тег отображается в фильтре
+
     def test_add_question_requires_admin(self, client):
         """Тест, что добавление вопроса требует админ-прав"""
         response = client.get('/add')
@@ -152,7 +169,8 @@ class TestQuestionViews:
         # Пробуем обновить вопрос
         response = admin_client.post(f'/questions/{question_id}/edit', data={
             'title': 'Updated Question?',
-            'text': 'Updated Answer'
+            'text': 'Updated Answer',
+            'tags': 'python, flask'
         }, follow_redirects=True)
         assert response.status_code == 200
 
@@ -161,6 +179,7 @@ class TestQuestionViews:
             question = Question.query.get(question_id)
             assert question.title == 'Updated Question?'
             assert question.text == 'Updated Answer'
+            assert sorted([t.name for t in question.tags]) == ['flask', 'python']
 
 
 class TestComments:

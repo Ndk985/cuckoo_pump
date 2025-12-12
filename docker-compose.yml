@@ -5,6 +5,8 @@ services:
     restart: always
     env_file:
       - .env
+    volumes:
+      - ./migrations:/app/migrations
     expose:
       - "8000"
     depends_on:

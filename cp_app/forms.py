@@ -16,6 +16,10 @@ class QuestionForm(FlaskForm):
         'Напишите ответ',
         validators=[DataRequired(message='Обязательное поле')]
     )
+    tags = StringField(
+        'Теги (через запятую, необязательно)',
+        description='Например: django, orm, flask, python',
+    )
     submit = SubmitField('Добавить')
 
 

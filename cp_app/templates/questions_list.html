@@ -18,14 +18,32 @@
     </div>
   </form>
 
-  <h2 class="mb-4 text-dark">Список всех вопросов</h2>
+  {% if tags %}
+    <div class="mb-4">
+      <div class="fw-bold mb-2" style="color: var(--text-primary);">Теги для фильтрации:</div>
+      <div class="tags-container">
+        <a href="{{ url_for('all_questions', search=search) }}"
+           class="tag-badge all-tag {% if not active_tag %}active{% endif %}">
+          Все
+        </a>
+        {% for tag in tags %}
+          <a href="{{ url_for('all_questions', tag=tag.name, search=search) }}"
+             class="tag-badge {% if active_tag == tag.name %}active{% endif %}">
+            {{ tag.name }}
+          </a>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+  <h2 class="mb-4" style="color: var(--text-primary);">Список всех вопросов</h2>
 
   <!-- Список вопросов -->
   <ul class="list-group mb-3" style="background-color: transparent; border: none;">
     {% for question in questions %}
       <li class="list-group-item d-flex justify-content-between align-items-center"
           style="background-color: transparent; border: none;">
-        <a href="{{ url_for('question_view', id=question.id) }}" class="text-decoration-none text-dark">
+        <a href="{{ url_for('question_view', id=question.id) }}" class="text-decoration-none" style="color: var(--text-primary);">
           {{ question.id }}. {{ question.title|truncate(80, killwords=True, end='…') }}
         </a>
       </li>

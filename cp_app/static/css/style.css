@@ -244,9 +244,86 @@ textarea.form-control.comment-input {
   color: #e7390d !important;
 }
 
+/* ====== Стили для тегов ====== */
+.tag-badge {
+  display: inline-block;
+  padding: 0.35em 0.65em;
+  font-size: 0.875em;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--text-primary);
+  background-color: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: 0.375rem;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  margin-right: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.tag-badge:hover {
+  background-color: var(--link-color);
+  color: var(--bg-primary);
+  border-color: var(--link-color);
+  text-decoration: none;
+}
+
+/* Активный тег (выбранный для фильтрации) */
+.tag-badge.active {
+  background-color: var(--link-color);
+  color: var(--bg-primary);
+  border-color: var(--link-color);
+}
+
+/* Тег "Все" */
+.tag-badge.all-tag {
+  background-color: transparent;
+  color: var(--text-primary);
+  border: 2px solid var(--border-color);
+}
+
+.tag-badge.all-tag:hover {
+  background-color: var(--border-color);
+  color: var(--bg-primary);
+  border-color: var(--border-color);
+}
+
+.tag-badge.all-tag.active {
+  background-color: var(--border-color);
+  color: var(--bg-primary);
+  border-color: var(--border-color);
+}
+
+/* Контейнер для тегов */
+.tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.tags-container .tag-badge {
+  margin-right: 0;
+  margin-bottom: 0;
+}
+
+/* Теги внутри параграфа (для совместимости) */
+p .tags-container {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-left: 0.5rem;
+  margin-bottom: 0;
+}
+
 /* Адаптивность для мобильных устройств */
 @media (max-width: 600px) {
   main {
     padding-bottom: 100px; /* Больше отступ на мобильных, если футер выше */
+  }
+  
+  .tag-badge {
+    font-size: 0.8em;
+    padding: 0.3em 0.5em;
   }
 }
