@@ -54,45 +54,59 @@
     {% endfor %}
   </ul>
 
-  <!-- Пагинация (ссылки и кнопки теперь используют text-body) -->
-  <nav aria-label="Page navigation">
-    <ul class="pagination justify-content-center" style="background-color: transparent; border: none;">
+  <!-- Пагинация -->
+  {% if pagination.pages > 1 %}
+  <nav aria-label="Page navigation" class="pagination-nav">
+    <ul class="pagination justify-content-center">
       {% if pagination.has_prev %}
         <li class="page-item">
-          <a class="page-link bg-transparent text-body border-2 border-dark-brown rounded-2"
-            href="{{ url_for('all_questions', page=pagination.prev_num, search=search) }}">« Назад</a>
+          <a class="page-link pagination-link"
+            href="{{ url_for('all_questions', page=pagination.prev_num, search=search, tag=active_tag) }}">
+            <span aria-hidden="true">&laquo;</span> Назад
+          </a>
         </li>
       {% else %}
         <li class="page-item disabled">
-          <span class="page-link bg-transparent text-body border-2 border-dark-brown rounded-2">« Назад</span>
+          <span class="page-link pagination-link pagination-disabled">
+            <span aria-hidden="true">&laquo;</span> Назад
+          </span>
         </li>
       {% endif %}
 
       {% for p in range(1, pagination.pages + 1) %}
         {% if p == pagination.page %}
           <li class="page-item active">
-            <span class="page-link bg-transparent text-body border-2 border-dark-brown rounded-2">{{ p }}</span>
+            <span class="page-link pagination-link pagination-active">{{ p }}</span>
           </li>
-        {% else %}
+        {% elif p == 1 or p == pagination.pages or (p >= pagination.page - 2 and p <= pagination.page + 2) %}
           <li class="page-item">
-            <a class="page-link bg-transparent text-body border-2 border-dark-brown rounded-2"
-              href="{{ url_for('all_questions', page=p, search=search) }}">{{ p }}</a>
+            <a class="page-link pagination-link"
+              href="{{ url_for('all_questions', page=p, search=search, tag=active_tag) }}">{{ p }}</a>
+          </li>
+        {% elif p == pagination.page - 3 or p == pagination.page + 3 %}
+          <li class="page-item disabled">
+            <span class="page-link pagination-link pagination-ellipsis">…</span>
           </li>
         {% endif %}
       {% endfor %}
 
       {% if pagination.has_next %}
         <li class="page-item">
-          <a class="page-link bg-transparent text-body border-2 border-dark-brown rounded-2"
-            href="{{ url_for('all_questions', page=pagination.next_num, search=search) }}">Вперед »</a>
+          <a class="page-link pagination-link"
+            href="{{ url_for('all_questions', page=pagination.next_num, search=search, tag=active_tag) }}">
+            Вперед <span aria-hidden="true">&raquo;</span>
+          </a>
         </li>
       {% else %}
         <li class="page-item disabled">
-          <span class="page-link bg-transparent text-body border-2 border-dark-brown rounded-2">Вперед »</span>
+          <span class="page-link pagination-link pagination-disabled">
+            Вперед <span aria-hidden="true">&raquo;</span>
+          </span>
         </li>
       {% endif %}
     </ul>
   </nav>
+  {% endif %}
 
   <div class="mt-4">
     <a href="{{ url_for('main_page') }}" class="btn btn-secondary">Назад на главную</a>

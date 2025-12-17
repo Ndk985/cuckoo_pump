@@ -185,11 +185,98 @@ textarea.form-control.comment-input {
 }
 
 /* === кнопки / ссылки пагинации === */
-.page-link, .btn-outline-secondary {
+.pagination-nav {
+  margin: 2rem 0;
+}
+
+.pagination {
+  margin: 0;
+  gap: 0.5rem;
+}
+
+.pagination-link {
+  color: var(--text-primary) !important;
+  background-color: transparent !important;
+  border: 2px solid var(--border-color) !important;
+  border-radius: 0.5rem !important;
+  padding: 0.5rem 1rem !important;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  min-width: 2.5rem;
+  text-align: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pagination-link:hover:not(.pagination-disabled):not(.pagination-active) {
+  color: var(--bg-primary) !important;
+  background-color: var(--link-color) !important;
+  border-color: var(--link-color) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Активная страница - явная подсветка */
+.pagination-active {
+  color: var(--bg-primary) !important;
+  background-color: var(--link-color) !important;
+  border-color: var(--link-color) !important;
+  font-weight: 700 !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transform: scale(1.1);
+  z-index: 1;
+  position: relative;
+}
+
+/* Отключенные элементы (кнопки Назад/Вперед когда недоступны) */
+.pagination-disabled {
+  color: var(--text-primary) !important;
+  background-color: transparent !important;
+  border-color: var(--border-color) !important;
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Многоточие */
+.pagination-ellipsis {
+  border: none !important;
+  background-color: transparent !important;
+  cursor: default;
+  pointer-events: none;
+  padding: 0.5rem 0.25rem !important;
+  min-width: auto;
+}
+
+.pagination-ellipsis:hover {
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Адаптивность для мобильных */
+@media (max-width: 768px) {
+  .pagination-link {
+    padding: 0.4rem 0.75rem !important;
+    font-size: 0.9rem;
+    min-width: 2rem;
+  }
+  
+  .pagination {
+    gap: 0.25rem;
+  }
+  
+  .pagination-active {
+    transform: scale(1.05);
+  }
+}
+
+.btn-outline-secondary {
   color: var(--bs-body-color) !important;
   border-color: var(--border-color) !important;
 }
-.page-link:hover, .btn-outline-secondary:hover {
+.btn-outline-secondary:hover {
   color: var(--bs-body-color) !important;
   background-color: transparent !important;
 }
