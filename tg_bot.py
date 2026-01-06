@@ -23,6 +23,7 @@ START_KB = [
 # -------------------- /start --------------------
 async def start(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     """Приветственное сообщение с кнопкой для запуска квиза"""
+    print(f"start command received from user {update.effective_user.id}", flush=True)
     keyboard = InlineKeyboardMarkup(START_KB)
     await update.message.reply_text(
         "Привет! Этот бот позволяет пройти квиз из 10 вопросов.\n\n"
@@ -34,16 +35,23 @@ async def start(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
 # -------------------- Запуск квиза --------------------
 async def quiz_start(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     """Инициализация квиза и отправка первого вопроса"""
+    print("quiz_start called", flush=True)
     # callback_query при нажатии кнопки
     query = update.callback_query
     if query:
+        print(f"Callback query received: {query.data}", flush=True)
         await query.answer()
+    else:
+        print("No callback query, this is a message", flush=True)
 
     # Получаем все id вопросов
     try:
+        print(f"Requesting questions from {FLASK_HOST}/api/questions/", flush=True)
         r = requests.get(f"{FLASK_HOST}/api/questions/", timeout=10)
+        print(f"Response status: {r.status_code}", flush=True)
         r.raise_for_status()
         all_questions = r.json()["questions"]
+        print(f"Got {len(all_questions)} questions", flush=True)
         all_ids = [q["id"] for q in all_questions]
     except Exception as e:
         print(
@@ -51,6 +59,8 @@ async def quiz_start(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
             repr(e),
             flush=True
         )
+        import traceback
+        traceback.print_exc()
         if query:
             await query.message.reply_text("Не удалось начать квиз 😥")
         else:
@@ -108,14 +118,22 @@ async def send_quiz_question(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
 
     # Отправляем текст вопроса
     text_safe = escape_markdown(question["title"], version=2)
-    if update.callback_query:
-        await update.callback_query.message.reply_text(
-            text_safe, reply_markup=reply_markup, parse_mode="MarkdownV2"
-        )
-    else:
-        await update.message.reply_text(
-            text_safe, reply_markup=reply_markup, parse_mode="MarkdownV2"
-        )
+    print(f"Sending question {q_id}: {question['title'][:50]}...", flush=True)
+    try:
+        if update.callback_query:
+            await update.callback_query.message.reply_text(
+                text_safe, reply_markup=reply_markup, parse_mode="MarkdownV2"
+            )
+        else:
+            await update.message.reply_text(
+                text_safe, reply_markup=reply_markup, parse_mode="MarkdownV2"
+            )
+        print("Question sent successfully", flush=True)
+    except Exception as e:
+        print(f"Error sending question: {repr(e)}", flush=True)
+        import traceback
+        traceback.print_exc()
+        raise
 
 
 # -------------------- Обработка "Знаю / Не знаю" --------------------
@@ -208,23 +226,76 @@ def main():
     app = Application.builder().token(TOKEN).build()
 
     app.add_handler(CommandHandler("start", start))
-    # Кнопка старт квиза
-    app.add_handler(CallbackQueryHandler(quiz_start, pattern="^start_quiz$"))
-    # Знаю / Не знаю
-    app.add_handler(
-        CallbackQueryHandler(quiz_answer_handler, pattern="^(know|dont_know)$")
-    )
-    # Ответил / Нужно подучить
-    app.add_handler(
-        CallbackQueryHandler(quiz_mark_handler, pattern="^(answered|review)$")
-    )
-    # Пройти ещё раз
-    app.add_handler(
-        CallbackQueryHandler(quiz_restart_handler, pattern="^restart$")
-    )
+    
+    # Универсальный обработчик для всех callback_query
+    async def all_callbacks(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
+        query = update.callback_query
+        if query:
+            print(f"DEBUG: Callback received: {query.data} from user {query.from_user.id}", flush=True)
+            await query.answer()  # Всегда отвечаем на callback
+            
+            # Маршрутизация по типу callback
+            if query.data == "start_quiz":
+                await quiz_start(update, ctx)
+            elif query.data in ["know", "dont_know"]:
+                await quiz_answer_handler(update, ctx)
+            elif query.data in ["answered", "review"]:
+                await quiz_mark_handler(update, ctx)
+            elif query.data == "restart":
+                await quiz_restart_handler(update, ctx)
+            else:
+                print(f"DEBUG: Unknown callback data: {query.data}", flush=True)
+                await query.message.reply_text("Неизвестная команда")
+        else:
+            print("DEBUG: No callback_query in update", flush=True)
+    
+    # Используем один универсальный обработчик для всех callback
+    app.add_handler(CallbackQueryHandler(all_callbacks))
 
-    print("Bot polling…")
-    app.run_polling()
+    # Обработчик ошибок
+    async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> None:
+        """Обработчик ошибок для логирования"""
+        print(f"Exception while handling an update: {context.error}", flush=True)
+        import traceback
+        traceback.print_exc()
+        
+        if isinstance(update, Update) and update.callback_query:
+            try:
+                await update.callback_query.answer("Произошла ошибка 😥")
+            except:
+                pass
+
+    app.add_error_handler(error_handler)
+
+    # Очищаем webhook и старые обновления перед запуском polling
+    async def post_init(app: Application) -> None:
+        bot = app.bot
+        try:
+            # Сбрасываем webhook, если он был установлен
+            await bot.delete_webhook(drop_pending_updates=True)
+            print("Webhook cleared, old updates dropped", flush=True)
+        except Exception as e:
+            print(f"Warning: Could not clear webhook: {e}", flush=True)
+
+    app.post_init = post_init
+
+    print("Bot polling…", flush=True)
+    print(f"Bot token set: {TOKEN is not None}", flush=True)
+    print(f"Flask host: {FLASK_HOST}", flush=True)
+    print("Handlers registered:", flush=True)
+    print(f"  - CommandHandler: start", flush=True)
+    print(f"  - CallbackQueryHandler: all_callbacks", flush=True)
+    
+    try:
+        app.run_polling(
+            drop_pending_updates=True,
+            allowed_updates=["message", "callback_query"]
+        )
+    except Exception as e:
+        print(f"Error starting bot: {e}", flush=True)
+        import traceback
+        traceback.print_exc()
+        raise
 
 
 if __name__ == "__main__":
